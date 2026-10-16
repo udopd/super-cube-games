@@ -721,6 +721,10 @@ app.get('/game-files/:slug/*', async (req, res) => {
   const game = await getGameBySlug(db, req.params.slug);
   if (!game) return res.status(404).send('Game not found');
   if (game.status !== 'published' && !(await getUser(req))?.isAdmin && !verifyTestPreview(req, game.slug)) return res.status(404).send('Not found');
+  // Game pages run in a sandboxed iframe with an opaque origin. The global
+  // `same-site` CORP policy blocks their stylesheet/script requests even though
+  // the assets are served from this platform, so explicitly allow game assets.
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   const relative = String(req.params[0] || game.entry_path || 'index.html').replace(/\\/g, '/');
   if (!relative || relative.startsWith('/') || relative.split('/').some((part) => part === '..' || part === '.')) return res.status(400).send('Invalid path');
   const base = path.resolve(gamesDir, game.slug);
