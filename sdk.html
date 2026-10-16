@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8"><script>(()=>{try{const t=localStorage.getItem('supercube-theme');document.documentElement.dataset.theme=(t==='dark'||t==='light')?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const l=localStorage.getItem('supercube-lang');if(l==='ru'||l==='en')document.documentElement.lang=l;}catch{}})();</script><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SDK для разработчиков — SUPER CUBE Games</title>
+  <meta name="description" content="Руководство SDK SUPER CUBE Games для браузерных и серверных игр, примеры интеграции и промпты для нейросетей.">
+  <link rel="canonical" href="/sdk.html"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/style.css">
+  <meta name="robots" content="index,follow"><meta name="sdk-contract-version" content="1.1">
+</head>
+<body>
+<header class="topbar"><div class="container topbar-inner"><a class="brand" href="/">SUPER CUBE</a><nav class="nav"></nav><div class="header-actions"><a class="text-link" id="profileLink" href="/profile.html" hidden>Кабинет</a><a class="text-link" id="adminLink" href="/admin.html" hidden>Админ</a><a class="text-link" id="loginLink" href="/login.html">Войти</a><button class="control" id="languageToggle" type="button" aria-label="Переключить язык">RU</button><button class="control" id="themeToggle" type="button" aria-label="Сменить тему">◐</button></div></div></header>
+<main class="container main">
+<section class="page-header"><h1 data-i18n="sdkReferenceTitle">SDK для разработчиков</h1><p data-i18n="sdkReferenceLead">Руководство для браузерных и серверных игр, примеры и промпты для нейросетей.</p><p><a class="button secondary" href="/documentation.html" data-i18n="navDocs">Документация</a></p></section>
+<div class="sdk-workspace"><aside class="sdk-sidebar"><strong data-i18n="sdkSidebar">SDK</strong><nav id="sdkSideLinks" class="docs-side-links"></nav></aside><section class="section sdk-reference-section"><div class="sdk-contract-note"><strong data-i18n="sdkContractNoteTitle">SDK contract · v1.1</strong><p data-i18n="sdkContractNoteBody">Browser SDK calls are requests to the platform, not a trusted source of truth. Keep game rules local only for single-player presentation; validate scores, state transitions and multiplayer actions on the server. Use stable game slugs, await SDK calls, handle guest mode and network failures, and never place credentials in the archive.</p></div><div id="sdkReferenceContent" class="sdk-reference-content" aria-live="polite"></div></section></div>
+</main>
+<footer class="foot"><div class="container foot-inner"><p class="foot-mark">SUPER CUBE</p><div class="foot-meta"><p class="foot-note" data-i18n="sdkFooterNote">DEVELOPER SDK · BROWSER + SERVER</p><a class="sdk-footer-link" href="/documentation.html" data-i18n="navDocs">Документация платформы</a><a class="sdk-footer-link" href="/privacy-policy.html" data-i18n="privacyPolicyLink">Политика конфиденциальности</a></div></div></footer>
+<script src="/js/common.js" defer></script><script src="/js/sdk-reference.js" defer></script>
+</body></html>

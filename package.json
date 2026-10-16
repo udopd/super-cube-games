@@ -1,0 +1,33 @@
+{
+  "name": "super-cube-games-platform",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Service-oriented browser game platform with PostgreSQL-backed internal Data API",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "start:data": "node data-service/server.js",
+    "dev": "node --watch server.js",
+    "build:data-catalog": "node scripts/build-query-catalog.mjs",
+    "check": "node --check server.js && node --check src/auth.js && node --check src/db.js && node --check src/security.js && node --check src/games.js && node --check src/analytics.js && node --check src/server-game-runtime.js && node --check runtime-service/server.js && node --check shared/data-client.js && node --check shared/data-api-session-store.js && node --check data-service/server.js && node --check public/js/common.js && node --check public/js/catalog.js && node --check public/js/auth.js && node --check public/js/profile.js && node --check public/js/admin.js && node --check public/js/admin-metrics.js && node --check public/js/game-host.js && node --check public/js/game-sdk.js && node --check public/js/game-modal.js && node --check public/js/leaderboard.js && node --check public/js/sdk-reference.js && node --check public/js/documentation.js && node --check scripts/test-ui-update.mjs && node --check public/js/password-login.js && node --check examples/durak-online/client.js && node --check examples/durak-online/server/index.js && node --check scripts/build-query-catalog.mjs && node --check scripts/import-sqlite-export.mjs && node --check scripts/test-query-catalog.mjs && node --check scripts/test-data-client.mjs && node --check scripts/test-auth-game-contract.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
+    "test": "npm run build:data-catalog && npm run check && npm run test:unit",
+    "test:unit": "node scripts/test-query-catalog.mjs && node scripts/test-data-client.mjs && node scripts/test-data-architecture.mjs && node scripts/test-auth-game-contract.mjs && node scripts/test-server-runtime-architecture.mjs && node scripts/test-server-game-proxy-body.mjs && node scripts/test-ui-update.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.0.1",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "image-size": "^1.2.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.5",
+    "yauzl": "^3.2.0",
+    "pg": "^8.16.3",
+    "express-async-errors": "^3.1.1"
+  }
+}

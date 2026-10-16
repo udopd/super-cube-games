@@ -1,0 +1,1 @@
+.game-page .topbar{position:relative}.game-page .topbar-inner{justify-content:space-between}.game-page .game-top-actions{margin-left:auto}.game-page .game-player-wrap{width:min(calc(100% - 40px),1180px)}.game-page .game-feedback{padding-bottom:30px}@media(max-width:600px){.game-page .game-player-wrap{width:min(calc(100% - 28px),1180px)}.game-page .test-pill{display:none}}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8"><script>(()=>{try{const t=localStorage.getItem('supercube-theme');document.documentElement.dataset.theme=(t==='dark'||t==='light')?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const l=localStorage.getItem('supercube-lang');if(l==='ru'||l==='en')document.documentElement.lang=l;}catch{}})();</script>
+  <meta name="viewport" content="width=device-width,initial-scale=1"><title>Избранное — SUPER CUBE Games</title><meta name="robots" content="noindex,follow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar"><div class="container topbar-inner"><a class="brand" href="/">SUPER CUBE</a><nav class="nav"><a href="/" data-i18n="navCatalog">Каталог</a><a href="/profile.html" data-i18n="myProfile">Мой кабинет</a></nav><div class="header-actions"><button id="logoutButton" class="control" type="button" data-i18n="signOut">Выйти</button><button class="control" id="languageToggle" type="button">RU</button><button class="control" id="themeToggle" type="button">◐</button></div></div></header>
+  <main class="container main">
+    <section class="page-header"><h1 data-i18n="favoritesTitle">Моё избранное</h1><p class="muted" data-i18n="favoritesLead">Игры, которые ты сохранил.</p></section>
+    <section class="section profile-list-section"><div class="section-head"><h2 class="section-title" data-i18n="favoritesSectionTitle">Избранное</h2></div><div id="favoritesList" class="game-list" aria-live="polite"><div class="empty-state">Загрузка…</div></div></section>
+    <section class="section profile-list-section"><div class="section-head"><h2 class="section-title" data-i18n="recentGames">Недавние игры</h2><p class="section-note" data-i18n="lastFive">Последние 5</p></div><div class="game-list" id="recentGames"></div></section>
+    <section class="section profile-list-section"><div class="section-head"><h2 class="section-title" data-i18n="topGames">Мои любимые</h2><p class="section-note" data-i18n="topThree">Топ-3 по времени игры</p></div><div class="game-list" id="topGames"></div></section>
+    <section class="section profile-list-section"><div class="section-head"><h2 class="section-title" data-i18n="playedGames">Все игры, в которые я играл</h2><p class="section-note" id="playedCount">—</p></div><div class="game-list" id="playedGames"></div></section>
+  </main>
+  <footer class="foot"><div class="container foot-inner"><p class="foot-mark">SUPER CUBE</p><div class="foot-meta"><a class="sdk-footer-link" href="/privacy-policy.html" data-i18n="privacyPolicyLink">Политика конфиденциальности</a></div></div></footer>
+  <script src="/js/common.js" defer></script><script src="/js/favorites.js" defer></script>
+</body>
+</html>

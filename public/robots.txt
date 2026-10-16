@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /profile.html
+Disallow: /login.html
+Disallow: /games/*-test
+Sitemap: /sitemap.xml

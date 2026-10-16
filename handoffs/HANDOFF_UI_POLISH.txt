@@ -1,0 +1,21 @@
+SUPER CUBE PLATFORM — UI POLISH UPDATE
+Date: 2026-10-11
+
+Included changes
+- Removed decorative arrow glyphs from Play CTA buttons and changed the Play CTA background to the selection accent (--green, light green).
+- Added XMLHttpRequest upload progress to both new-game upload and archive replacement, showing transfer percentage, exact uploaded/total sizes, server processing status and a beforeunload warning while upload/processing is active.
+- The game-title column continues to show game identity/runtime/tags/archive size without the long description.
+- Email-code and password login are available; Back links use same-origin browser history when available, with a safe fallback page.
+- Leaderboard score information tooltip opens on hover/focus and remains accessible by click/touch.
+- SDK is integrated into /documentation.html#sdk-reference. It has RU/EN localization, tabs for simple browser games/server games, SDK method documentation and copyable prompts to create a new game or adapt an existing ZIP. /sdk.html redirects to the new section.
+- SDK links have been removed from headers and moved to footer signature areas.
+
+Validation
+- `npm test` passed on the updated project.
+- This includes node syntax checks, SQL catalog tests, Data API/data architecture tests, auth/game contract tests, server runtime/proxy tests and the new UI regression test.
+- No live browser visual test or Docker Compose integration test was run in this editing environment.
+
+Upgrade
+- Preserve the existing `.env` and Docker volumes.
+- From the project folder run: `docker compose up -d --build --force-recreate platform data-api`.
+- Then inspect: `docker compose logs --tail=100 platform data-api`.

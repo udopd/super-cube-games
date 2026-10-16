@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f5ed" />
+  <title>2048 — SUPER CUBE Games</title>
+  <link rel="stylesheet" href="game.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="motion.css" />
+</head>
+<body>
+  <main class="game-wrap">
+    <header class="topline"><a href="https://supercube.games" target="_blank" rel="noreferrer">SUPER CUBE <span>ARCADE</span></a><span class="edition" data-i18n="edition">PUZZLE № 01</span></header>
+    <section class="hero">
+      <div><p class="eyebrow" data-i18n="eyebrow">SLIDE · MERGE · REPEAT</p><h1>2048<span>.</span></h1><p class="intro" data-i18n="intro">Соединяй одинаковые плитки. Дойди до 2048.</p></div>
+      <div class="score-row"><div class="score-box"><span data-i18n="score">СЧЁТ</span><strong id="score">0</strong></div><div class="score-box best"><span data-i18n="best">РЕКОРД</span><strong id="best">0</strong></div></div>
+    </section>
+    <nav class="controls"><button class="new-game" id="newGame"><span data-i18n="newGame">Новая игра</span> <span>↻</span></button><button class="undo" id="undo" disabled><span data-i18n="undo">Отменить ход</span> <span>↶</span></button><p data-i18n="hint">Стрелки или WASD для хода</p></nav>
+    <section class="board-shell" aria-label="Игровое поле 2048"><div class="board" id="board" role="grid"></div><div class="overlay hidden" id="overlay"><div class="overlay-card"><p id="overlayEyebrow">ОТЛИЧНО</p><h2 id="overlayTitle">2048!</h2><button id="continueGame" class="new-game">Продолжить</button></div></div></section>
+    <footer><span>© SUPER CUBE GAMES</span><span id="gameStatus" aria-live="polite">УДАЧНОЙ ИГРЫ</span><span>BEST MOVES ONLY</span></footer>
+    <div class="mobile-controls" aria-label="Кнопки управления"><button data-direction="up" aria-label="Вверх">↑</button><div><button data-direction="left" aria-label="Влево">←</button><button data-direction="down" aria-label="Вниз">↓</button><button data-direction="right" aria-label="Вправо">→</button></div></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>

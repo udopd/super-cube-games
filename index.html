@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8"><script>(()=>{try{const t=localStorage.getItem('supercube-theme');document.documentElement.dataset.theme=(t==='dark'||t==='light')?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const l=localStorage.getItem('supercube-lang');if(l==='ru'||l==='en')document.documentElement.lang=l;}catch{}})();</script>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SUPER CUBE Games — Играй в браузере бесплатно</title>
+  <meta name="description" content="SUPER CUBE Games — каталог бесплатных браузерных игр: головоломки, аркады, казуальные игры и инди-проекты. Играй без скачивания.">
+  <meta name="keywords" content="браузерные игры, онлайн игры бесплатно, игры без скачивания, веб игры, мини игры, HTML5 игры, головоломки, аркады, казуальные игры, SUPER CUBE Games">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#f4f4f0">
+  <link rel="canonical" href="/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website"><meta property="og:title" content="SUPER CUBE Games — Браузерные игры"><meta property="og:description" content="Играй в бесплатные браузерные игры без скачивания."><meta property="og:url" content="/"><meta property="og:image" content="/og-default.svg">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"SUPER CUBE Games","description":"Каталог бесплатных браузерных игр","potentialAction":{"@type":"SearchAction","target":"/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+</head>
+<body>
+  <header class="topbar"><div class="container topbar-inner">
+    <a class="brand" href="/" aria-label="SUPER CUBE Games">SUPER CUBE</a>
+    <nav class="nav" aria-label="Main navigation"><a href="#catalog" data-i18n="navCatalog">Каталог</a><a href="/leaderboard.html" data-i18n="navLeaderboard">Топ игроков</a></nav>
+    <div class="header-actions"><a class="text-link" id="profileLink" href="/profile.html" hidden data-i18n="myProfile">Мой кабинет</a><a class="text-link" id="adminLink" href="/admin.html" hidden data-i18n="adminLink">Админ</a><a class="text-link" id="loginLink" href="/login.html" data-i18n="signIn">Войти</a><button class="control" id="languageToggle" type="button" aria-label="Switch language">RU</button><button class="control" id="themeToggle" type="button" aria-label="Switch theme">◐</button></div>
+  </div></header>
+  <main class="main">
+    <section class="section container catalog-only" id="catalog">
+      <form id="filters" class="filters"><input class="field" name="q" id="searchInput" placeholder="Поиск игры или тега…" data-i18n-placeholder="searchPlaceholder" autocomplete="off"><select class="filter-select" name="tag" id="tagFilter" aria-label="Filter by tag"><option value="" data-i18n="allTags">Все теги</option></select><select class="filter-select" name="players" id="playersFilter" aria-label="Filter by players"><option value="any" data-i18n="anyPlayers">Любое число игроков</option><option value="solo" data-i18n="solo">Один игрок</option><option value="multi" data-i18n="multi">Несколько игроков</option></select><select class="filter-select" name="minRating" id="ratingFilter" aria-label="Minimum rating"><option value="0" data-i18n="anyRating">Любая оценка</option><option value="3">3+ ★</option><option value="4">4+ ★</option><option value="4.5">4.5+ ★</option></select><select class="filter-select" name="sort" id="sortFilter" aria-label="Sort games"><option value="newest" data-i18n="sortNewest">Сначала новые</option><option value="rating" data-i18n="sortRating">По рейтингу</option><option value="players" data-i18n="sortPlayers">По игрокам</option><option value="plays" data-i18n="sortPopular">По популярности</option></select><button class="button secondary" type="reset" id="resetFilters" data-i18n="reset">Сбросить</button></form>
+      <div class="games-grid" id="gamesGrid" aria-live="polite"></div><div class="empty-state hidden" id="emptyState" data-i18n="emptyCatalog">Пока нет опубликованных игр. Загляни чуть позже.</div>
+    </section>
+  </main>
+  <footer class="foot"><div class="container foot-inner"><p class="foot-mark">SUPER CUBE</p><div class="foot-meta"><p class="foot-note">© <span id="year"></span> SUPER CUBE Games<br><span data-i18n="footerNote">Маленькие игры. Большие идеи.</span></p><a class="sdk-footer-link" href="/sdk.html" data-i18n="sdkFooterLink">SDK для разработчиков</a><a class="sdk-footer-link" href="/privacy-policy.html" data-i18n="privacyPolicyLink">Политика конфиденциальности</a></div></div></footer>
+  <script src="/js/common.js" defer></script><script src="/js/game-modal.js" defer></script><script src="/js/catalog.js" defer></script>
+</body></html>

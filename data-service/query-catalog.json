@@ -1,0 +1,656 @@
+{
+  "59ba31d1a469475a2593ff56f244d817b587b3b37abf2aa45dddef656fc671d1": {
+    "sourceSql": "SELECT id,public_id,email,display_name,avatar_url,email_verified,created_at,last_login_at FROM users WHERE id=?",
+    "sql": "SELECT id,public_id,email,display_name,avatar_url,email_verified,created_at,last_login_at FROM users WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "bc1065fb0684bd2064a4c3977243d20aa01b19aa2395e337cda858d61096af1a": {
+    "sourceSql": "SELECT ROUND(AVG(rating),2) AS avg,COUNT(*) AS count FROM ratings WHERE game_id=?",
+    "sql": "SELECT ROUND(AVG(rating),2) AS avg,COUNT(*) AS count FROM ratings WHERE game_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "31a0ac182f1aaa423754de77a28bbaaf1b7861899a7be401fd9cfa7fd40da4f7": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM reviews WHERE game_id=? AND parent_id IS NULL",
+    "sql": "SELECT COUNT(*) AS n FROM reviews WHERE game_id=$1 AND parent_id IS NULL",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "a694dd8b5daa24f358de0b328623ee76c415819995027c55cbfecdd55015e7ac": {
+    "sourceSql": "SELECT game_id FROM favorites WHERE user_id=?",
+    "sql": "SELECT game_id FROM favorites WHERE user_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "ecca9380c7ef02092b39de4745133de4c2034bca4596b904d026a3a880fc7445": {
+    "sourceSql": "SELECT game_id,rating FROM ratings WHERE user_id=?",
+    "sql": "SELECT game_id,rating FROM ratings WHERE user_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "bf90e3b9abc892acf7983e2314b172a054763bf6bff095c98a6ec797f84d2bb0": {
+    "sourceSql": "SELECT tags_en_json AS tags_json,tags_json AS legacy_tags FROM games WHERE status='published'",
+    "sql": "SELECT tags_en_json AS tags_json,tags_json AS legacy_tags FROM games WHERE status='published'",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "2a6d77d3f26975f2d6552f09f8eb8fe91cdf63e6a1984ef6f6eb1bda899d5710": {
+    "sourceSql": "SELECT rating FROM ratings WHERE game_id=? AND user_id=?",
+    "sql": "SELECT rating FROM ratings WHERE game_id=$1 AND user_id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "27174d31e179be5bccfe150a545285fb44827f3ef97d5480bf917460f079d6a0": {
+    "sourceSql": "SELECT 1 FROM favorites WHERE game_id=? AND user_id=?",
+    "sql": "SELECT 1 FROM favorites WHERE game_id=$1 AND user_id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "473bfbecb2ec2b88ecadcc5e3a4e06f67ed17cd6c17d8cae5e1050f6369bb65d": {
+    "sourceSql": "SELECT r.id,r.parent_id AS parentId,r.is_admin_reply AS isAdminReply,r.body,r.created_at AS createdAt,r.updated_at AS updatedAt,\n      u.id AS userId,u.public_id AS playerId,u.display_name AS name,u.avatar_url AS avatar\n    FROM reviews r JOIN users u ON u.id=r.user_id WHERE r.game_id=? ORDER BY r.created_at ASC",
+    "sql": "SELECT r.id,r.parent_id AS parentId,r.is_admin_reply AS isAdminReply,r.body,r.created_at AS createdAt,r.updated_at AS updatedAt,\n      u.id AS userId,u.public_id AS playerId,u.display_name AS name,u.avatar_url AS avatar\n    FROM reviews r JOIN users u ON u.id=r.user_id WHERE r.game_id=$1 ORDER BY r.created_at ASC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "5fc38926bf4826a771772bb1653dccb20005ec938a734cbc3302df4aee230871": {
+    "sourceSql": "INSERT INTO ratings(game_id,user_id,rating,updated_at) VALUES(?,?,?,?)\n    ON CONFLICT(game_id,user_id) DO UPDATE SET rating=excluded.rating,updated_at=excluded.updated_at",
+    "sql": "INSERT INTO ratings(game_id,user_id,rating,updated_at) VALUES($1,$2,$3,$4)\n    ON CONFLICT(game_id,user_id) DO UPDATE SET rating=excluded.rating,updated_at=excluded.updated_at",
+    "parameterCount": 4,
+    "returnsId": false
+  },
+  "0056616fc7df64bf697a79d88be3134381a6e8492ee87eb418e53c8820eab2bb": {
+    "sourceSql": "INSERT INTO reviews(game_id,user_id,body,created_at,updated_at) VALUES(?,?,?,?,?)",
+    "sql": "INSERT INTO reviews(game_id,user_id,body,created_at,updated_at) VALUES($1,$2,$3,$4,$5)",
+    "parameterCount": 5,
+    "returnsId": true
+  },
+  "2145ac58c48c21a7c276ddc7766d018acac2cb0fef1ed3144ee0e48014203193": {
+    "sourceSql": "SELECT * FROM reviews WHERE id=? AND game_id=?",
+    "sql": "SELECT * FROM reviews WHERE id=$1 AND game_id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "59a3024a00f49c786b6ccd71efe157e7864effad09fd8aa37a00e9b18ce5e0b4": {
+    "sourceSql": "UPDATE reviews SET body=?,updated_at=? WHERE id=?",
+    "sql": "UPDATE reviews SET body=$1,updated_at=$2 WHERE id=$3",
+    "parameterCount": 3,
+    "returnsId": false
+  },
+  "ae83630af5a97c0ce22c0c764c017daa5ccb052998fad3c06fcefadbc5ce43c4": {
+    "sourceSql": "DELETE FROM reviews WHERE id=?",
+    "sql": "DELETE FROM reviews WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "0b961c86f91d7e63e51dcc55a0c306b4a6e816388d85bcd7a7b50581bca10cc1": {
+    "sourceSql": "SELECT id FROM reviews WHERE id=? AND game_id=? AND parent_id IS NULL",
+    "sql": "SELECT id FROM reviews WHERE id=$1 AND game_id=$2 AND parent_id IS NULL",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "3e16cf361f118f11b8243adc90f63126acaff563a8966fa94326098fe7a7c34d": {
+    "sourceSql": "INSERT INTO reviews(game_id,user_id,parent_id,is_admin_reply,body,created_at,updated_at) VALUES(?,?,?,1,?,?,?)",
+    "sql": "INSERT INTO reviews(game_id,user_id,parent_id,is_admin_reply,body,created_at,updated_at) VALUES($1,$2,$3,1,$4,$5,$6)",
+    "parameterCount": 6,
+    "returnsId": true
+  },
+  "c644e8c08def63b98acc7f8d4d54f9250f5a986ef09297c0fe88a72c1ea4704b": {
+    "sourceSql": "DELETE FROM favorites WHERE game_id=? AND user_id=?",
+    "sql": "DELETE FROM favorites WHERE game_id=$1 AND user_id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "cce0ed44caf52699edd82c917fbdb39fe6d3e5935a09b03c5984a254ddf1aaa9": {
+    "sourceSql": "INSERT INTO favorites(game_id,user_id,created_at) VALUES(?,?,?)",
+    "sql": "INSERT INTO favorites(game_id,user_id,created_at) VALUES($1,$2,$3)",
+    "parameterCount": 3,
+    "returnsId": false
+  },
+  "e792cb22728890608559025382d299c7feaaa451e69babfa3a3b49384e212050": {
+    "sourceSql": "SELECT 1 FROM game_events WHERE game_id=? AND user_id=? AND event_type='favorite_added' LIMIT 1",
+    "sql": "SELECT 1 FROM game_events WHERE game_id=$1 AND user_id=$2 AND event_type='favorite_added' LIMIT 1",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "98708e286f8ab0c2e6d4d083dc5f37110b91de220da1c2130d5c9f99c576d8b6": {
+    "sourceSql": "DELETE FROM email_codes WHERE email=?",
+    "sql": "DELETE FROM email_codes WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "f5be408c2490b9a6802f184d30505d4711a3cc0e9e5221bf5f6a0e27801b9eb0": {
+    "sourceSql": "DELETE FROM password_reset_tokens WHERE email=?",
+    "sql": "DELETE FROM password_reset_tokens WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "3be371f8ea7e76aedde761879362551e3291d6699854900ce25868b8d1e1c5fa": {
+    "sourceSql": "DELETE FROM users WHERE id=?",
+    "sql": "DELETE FROM users WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "d9b2b0f3e7a42fe031d70daf3e25ddc8fad7507b6b4182940d2ea5762b9bc6f0": {
+    "sourceSql": "UPDATE users SET display_name=? WHERE id=?",
+    "sql": "UPDATE users SET display_name=$1 WHERE id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "69bd0a926d6e35c9dae3821a715b168ba2df32890f3aeb7e156a450002736f8f": {
+    "sourceSql": "UPDATE users SET avatar_url=? WHERE id=?",
+    "sql": "UPDATE users SET avatar_url=$1 WHERE id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "89fe8e7ec7df7632223b7c19279e654704ec6dc82a7e0a8b851df835f303b04e": {
+    "sourceSql": "SELECT password_hash FROM users WHERE id=?",
+    "sql": "SELECT password_hash FROM users WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "5cf121c54d2630fcc450b9fa722b082df0ead209048380c8135d891dfcddc946": {
+    "sourceSql": "UPDATE users SET password_hash=? WHERE id=?",
+    "sql": "UPDATE users SET password_hash=$1 WHERE id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "9de3ce172b956f01a5f9dcb417345054187653ae53a141a4e331a6b6734317f9": {
+    "sourceSql": "SELECT id,password_hash,email_verified FROM users WHERE email=?",
+    "sql": "SELECT id,password_hash,email_verified FROM users WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "40a7d30e3b2143fd4bf936ec21101ffffcfeae3278c47a57b1f3d1c64f6ddac1": {
+    "sourceSql": "INSERT INTO users(email, display_name, email_verified, created_at, last_login_at) VALUES(?,?,1,?,?)",
+    "sql": "INSERT INTO users(email, display_name, email_verified, created_at, last_login_at) VALUES($1,$2,1,$3,$4)",
+    "parameterCount": 4,
+    "returnsId": true
+  },
+  "485c44f34c73a72f93860d11de757284e31208856c39c0cf295e04fd509def1d": {
+    "sourceSql": "UPDATE users SET email_verified=1, last_login_at=? WHERE id=?",
+    "sql": "UPDATE users SET email_verified=1, last_login_at=$1 WHERE id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "0a73df890b56481975c72e9fb7f8c4f1c4ee723b42b58774e0359e69878837e4": {
+    "sourceSql": "SELECT id,slug,title,status,runtime_type,updated_at FROM games ORDER BY title ASC",
+    "sql": "SELECT id,slug,title,status,runtime_type,updated_at FROM games ORDER BY title ASC",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "27155e838e7b5648a1aad9283ee4b94acec27b01e513d4ffb2ebcdffc93c5b2c": {
+    "sourceSql": "SELECT e.created_at AS createdAt,e.event_type AS eventType,e.source,g.slug,g.title FROM game_events e LEFT JOIN games g ON g.id=e.game_id ORDER BY e.created_at DESC LIMIT 100",
+    "sql": "SELECT e.created_at AS createdAt,e.event_type AS eventType,e.source,g.slug,g.title FROM game_events e LEFT JOIN games g ON g.id=e.game_id ORDER BY e.created_at DESC LIMIT 100",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "1f5aaac935672f5e3fc70c31bcbbfb6de063920f940cbadfffe992f0142e936f": {
+    "sourceSql": "SELECT COUNT(*) AS sessions,COALESCE(SUM(duration_seconds),0) AS seconds,COUNT(DISTINCT game_id) AS games FROM play_sessions WHERE user_id=?",
+    "sql": "SELECT COUNT(*) AS sessions,COALESCE(SUM(duration_seconds),0) AS seconds,COUNT(DISTINCT game_id) AS games FROM play_sessions WHERE user_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "3f5d1935b49d8b26201fbb70b83883c8c61ace094dbf6ff8b9c7961ad23ffba5": {
+    "sourceSql": "SELECT g.title,g.slug,SUM(p.duration_seconds) AS seconds,COUNT(*) AS sessions,MAX(p.started_at) AS lastPlayed\n    FROM play_sessions p JOIN games g ON g.id=p.game_id WHERE p.user_id=? GROUP BY g.id ORDER BY seconds DESC",
+    "sql": "SELECT g.title,g.slug,SUM(p.duration_seconds) AS seconds,COUNT(*) AS sessions,MAX(p.started_at) AS lastPlayed\n    FROM play_sessions p JOIN games g ON g.id=p.game_id WHERE p.user_id=$1 GROUP BY g.id ORDER BY seconds DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "0029fcc6abc6f54ccd8a0e4550ab45157557412b01458633709607fa2739c241": {
+    "sourceSql": "SELECT g.title,g.slug,p.started_at AS startedAt,p.ended_at AS endedAt,p.last_seen_at AS lastSeenAt,p.duration_seconds AS seconds,p.source,p.is_active AS active\n    FROM play_sessions p JOIN games g ON g.id=p.game_id WHERE p.user_id=? ORDER BY p.started_at DESC",
+    "sql": "SELECT g.title,g.slug,p.started_at AS startedAt,p.ended_at AS endedAt,p.last_seen_at AS lastSeenAt,p.duration_seconds AS seconds,p.source,p.is_active AS active\n    FROM play_sessions p JOIN games g ON g.id=p.game_id WHERE p.user_id=$1 ORDER BY p.started_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "eee2a7777ef87e68b2532e151ef9a7bac283ba5ab2a0b314d8dd04cf03971101": {
+    "sourceSql": "SELECT r.id,r.parent_id AS parentId,r.is_admin_reply AS isAdminReply,r.body,r.created_at AS createdAt,r.updated_at AS updatedAt,g.title,g.slug\n    FROM reviews r JOIN games g ON g.id=r.game_id WHERE r.user_id=? ORDER BY r.created_at DESC",
+    "sql": "SELECT r.id,r.parent_id AS parentId,r.is_admin_reply AS isAdminReply,r.body,r.created_at AS createdAt,r.updated_at AS updatedAt,g.title,g.slug\n    FROM reviews r JOIN games g ON g.id=r.game_id WHERE r.user_id=$1 ORDER BY r.created_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "1f70bf764895e98af05b9b9d956a4caf867e1d6fb17f10fea555f65bfd96ce2a": {
+    "sourceSql": "SELECT g.title,g.slug,r.rating,r.updated_at AS updatedAt FROM ratings r JOIN games g ON g.id=r.game_id WHERE r.user_id=? ORDER BY r.updated_at DESC",
+    "sql": "SELECT g.title,g.slug,r.rating,r.updated_at AS updatedAt FROM ratings r JOIN games g ON g.id=r.game_id WHERE r.user_id=$1 ORDER BY r.updated_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "41d221ba28446172046470554bfee7a15ecb6a0bcea2923912ef6be657f0f7bd": {
+    "sourceSql": "SELECT g.title,g.slug,f.created_at AS addedAt FROM favorites f JOIN games g ON g.id=f.game_id WHERE f.user_id=? ORDER BY f.created_at DESC",
+    "sql": "SELECT g.title,g.slug,f.created_at AS addedAt FROM favorites f JOIN games g ON g.id=f.game_id WHERE f.user_id=$1 ORDER BY f.created_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "cacaab919a71967c03dda4095a224cf05b0bde45479a25cc493bff9d6b16dbaf": {
+    "sourceSql": "SELECT g.title,g.slug,s.data_json AS data,s.updated_at AS updatedAt FROM cloud_saves s JOIN games g ON g.id=s.game_id WHERE s.user_id=? ORDER BY s.updated_at DESC",
+    "sql": "SELECT g.title,g.slug,s.data_json AS data,s.updated_at AS updatedAt FROM cloud_saves s JOIN games g ON g.id=s.game_id WHERE s.user_id=$1 ORDER BY s.updated_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "131d7194171532378e8720501ccae44ed74af26625e06a2ddbdd83900d6e80d1": {
+    "sourceSql": "SELECT g.title,g.slug,e.event_type AS eventType,e.source,e.metadata_json AS metadata,e.created_at AS createdAt\n    FROM game_events e JOIN games g ON g.id=e.game_id WHERE e.user_id=? ORDER BY e.created_at DESC",
+    "sql": "SELECT g.title,g.slug,e.event_type AS eventType,e.source,e.metadata_json AS metadata,e.created_at AS createdAt\n    FROM game_events e JOIN games g ON g.id=e.game_id WHERE e.user_id=$1 ORDER BY e.created_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "4e1253cdf6b235c57304280c6efb66d5421b396649a6d8b37c1f4ab911740846": {
+    "sourceSql": "SELECT g.title,g.slug,COUNT(*) AS shareEvents,MAX(e.created_at) AS lastShared\n    FROM game_events e JOIN games g ON g.id=e.game_id\n    WHERE e.user_id=? AND e.event_type='game_shared'\n    GROUP BY g.id ORDER BY lastShared DESC",
+    "sql": "SELECT g.title,g.slug,COUNT(*) AS shareEvents,MAX(e.created_at) AS lastShared\n    FROM game_events e JOIN games g ON g.id=e.game_id\n    WHERE e.user_id=$1 AND e.event_type='game_shared'\n    GROUP BY g.id ORDER BY lastShared DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "f91257caaf1cf491208ada53d179157b55be36d6e48c469558785fcdc5e1f88d": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM reviews WHERE user_id=? AND parent_id IS NULL",
+    "sql": "SELECT COUNT(*) AS n FROM reviews WHERE user_id=$1 AND parent_id IS NULL",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "ad1fc6e378fea9897fd77c2ee0b84aa07183e70b4b86784c6809e92fa02cdc22": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM favorites WHERE user_id=?",
+    "sql": "SELECT COUNT(*) AS n FROM favorites WHERE user_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "e6964ddb340be235c94f244e0365e8e16a68c63b54248588a9ac096b30f3675a": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM cloud_saves WHERE user_id=?",
+    "sql": "SELECT COUNT(*) AS n FROM cloud_saves WHERE user_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "29398e77f638fed3ecb634a01a7da3939daffee8e666cf3882087bc2c46d04e6": {
+    "sourceSql": "SELECT id,email,avatar_url FROM users WHERE id=?",
+    "sql": "SELECT id,email,avatar_url FROM users WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "792e268b36491057be47e2d6e73c446f58557e0a299b55002744ad6914061efb": {
+    "sourceSql": "SELECT email,display_name FROM users WHERE id=?",
+    "sql": "SELECT email,display_name FROM users WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "c335b0243ed9c86acf060098267c23a960e685109e45a0c82981dbb53da12eae": {
+    "sourceSql": "SELECT data_json,updated_at FROM cloud_saves WHERE game_id=? AND user_id=?",
+    "sql": "SELECT data_json,updated_at FROM cloud_saves WHERE game_id=$1 AND user_id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "66e3364528a2b0f10df1bc4db9d70883ea373f4a9e21b077a6ec4f72a0c39351": {
+    "sourceSql": "INSERT INTO cloud_saves(game_id,user_id,data_json,updated_at) VALUES(?,?,?,?)\n    ON CONFLICT(game_id,user_id) DO UPDATE SET data_json=excluded.data_json,updated_at=excluded.updated_at",
+    "sql": "INSERT INTO cloud_saves(game_id,user_id,data_json,updated_at) VALUES($1,$2,$3,$4)\n    ON CONFLICT(game_id,user_id) DO UPDATE SET data_json=excluded.data_json,updated_at=excluded.updated_at",
+    "parameterCount": 4,
+    "returnsId": false
+  },
+  "f51a4129c269b6ddf7f1a683b8d1da7d21e519785c1acbeecbc43db300e9343f": {
+    "sourceSql": "UPDATE games SET title=?,description=?,tags_json=?,capsule_path=?,entry_path=?,description_ru=?,description_en=?,tags_ru_json=?,tags_en_json=?,runtime_type=?,archive_bytes=?,updated_at=? WHERE id=?",
+    "sql": "UPDATE games SET title=$1,description=$2,tags_json=$3,capsule_path=$4,entry_path=$5,description_ru=$6,description_en=$7,tags_ru_json=$8,tags_en_json=$9,runtime_type=$10,archive_bytes=$11,updated_at=$12 WHERE id=$13",
+    "parameterCount": 13,
+    "returnsId": false
+  },
+  "6cb8a4432893e02bd29ae650644fb6082cd383577017e54a6e807f84de6425c8": {
+    "sourceSql": "DELETE FROM games WHERE id=?",
+    "sql": "DELETE FROM games WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "27f2e2c1aa518109f1594d558c22ca34dbf86cd08daa8e2d14614d96bee38f8f": {
+    "sourceSql": "UPDATE games SET title=?,description=?,tags_json=?,min_players=?,max_players=?,description_ru=?,description_en=?,tags_ru_json=?,tags_en_json=?,runtime_type=?,updated_at=? WHERE id=?",
+    "sql": "UPDATE games SET title=$1,description=$2,tags_json=$3,min_players=$4,max_players=$5,description_ru=$6,description_en=$7,tags_ru_json=$8,tags_en_json=$9,runtime_type=$10,updated_at=$11 WHERE id=$12",
+    "parameterCount": 12,
+    "returnsId": false
+  },
+  "a693ad28a05990ec8a664b3fa8beb565c35d8ab4bb755fdd5d7463e4d72c49af": {
+    "sourceSql": "UPDATE games SET capsule_path=?,updated_at=? WHERE id=?",
+    "sql": "UPDATE games SET capsule_path=$1,updated_at=$2 WHERE id=$3",
+    "parameterCount": 3,
+    "returnsId": false
+  },
+  "5f5313b0901256e4be77d3138693531d60b1f65e9877850b98dd9a299c1dffc4": {
+    "sourceSql": "UPDATE games SET status='published',published_at=?,updated_at=? WHERE id=?",
+    "sql": "UPDATE games SET status='published',published_at=$1,updated_at=$2 WHERE id=$3",
+    "parameterCount": 3,
+    "returnsId": false
+  },
+  "da51c9befd721670dfdd8b38515c45142e31b94bc32047ad93c98aea10efab8e": {
+    "sourceSql": "UPDATE games SET status='draft',published_at=NULL,updated_at=? WHERE id=?",
+    "sql": "UPDATE games SET status='draft',published_at=NULL,updated_at=$1 WHERE id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "7024a3c22a993b2374dd0c6db6701413037ecb3add8f0b387cdcc1f26afd4f77": {
+    "sourceSql": "SELECT slug, updated_at, published_at FROM games WHERE status='published'",
+    "sql": "SELECT slug, updated_at, published_at FROM games WHERE status='published'",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "fb58d7663159047a65f7e1cb8371cfc56f06e67bc5713167b340c41af6f45807": {
+    "sourceSql": "SELECT * FROM games WHERE status='published' AND runtime_type='server' ORDER BY published_at",
+    "sql": "SELECT * FROM games WHERE status='published' AND runtime_type='server' ORDER BY published_at",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "5abb013d35337c229d8dfe73642d22fba943d589e0c24ab4b74a38de3ec819cc": {
+    "sourceSql": "SELECT provider_subject FROM identities WHERE user_id=? AND provider=?",
+    "sql": "SELECT provider_subject FROM identities WHERE user_id=$1 AND provider=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "e1ce06fe6072f925bdc44b08378ed38157bee17210b2b257f94009dd1e77261c": {
+    "sourceSql": "INSERT INTO identities(user_id, provider, provider_subject, created_at)\n      VALUES(?,?,?,?) ON CONFLICT(provider, provider_subject) DO NOTHING",
+    "sql": "INSERT INTO identities(user_id, provider, provider_subject, created_at)\n      VALUES($1,$2,$3,$4) ON CONFLICT(provider, provider_subject) DO NOTHING",
+    "parameterCount": 4,
+    "returnsId": false
+  },
+  "967d72deee7422d4be64d6907aabe037f9f9381ffec32e6c482afaacfc97bd53": {
+    "sourceSql": "SELECT user_id FROM identities WHERE provider=? AND provider_subject=?",
+    "sql": "SELECT user_id FROM identities WHERE provider=$1 AND provider_subject=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "01488c5360a79f6231abe0ea1f61fe14ffb41cb73ca9e697d1e7e32daad29b75": {
+    "sourceSql": "SELECT public_id FROM users WHERE id=?",
+    "sql": "SELECT public_id FROM users WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "0d77ea31d4c486ce2cbf629bf7902b9f089df8cf45ac4546eab27187cf0fd827": {
+    "sourceSql": "SELECT 1 FROM users WHERE public_id=?",
+    "sql": "SELECT 1 FROM users WHERE public_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "d16d51dd690af53aa3f21c5ae6fd7ff28505e7f471d0571cc33e857346c6a860": {
+    "sourceSql": "UPDATE users SET public_id=? WHERE id=?",
+    "sql": "UPDATE users SET public_id=$1 WHERE id=$2",
+    "parameterCount": 2,
+    "returnsId": false
+  },
+  "e7e2fea6b11422a5da002bea7e5198ffb79d2cfa44ba0e767334f30c6f01b2ef": {
+    "sourceSql": "SELECT u.* FROM identities i JOIN users u ON u.id=i.user_id\n      WHERE i.provider='email' AND i.provider_subject=?",
+    "sql": "SELECT u.* FROM identities i JOIN users u ON u.id=i.user_id\n      WHERE i.provider='email' AND i.provider_subject=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "0f6e1668978c780838eb454ddc90af7a984f0a4fee2f63bda3347246359ff852": {
+    "sourceSql": "SELECT * FROM users WHERE email=?",
+    "sql": "SELECT * FROM users WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "f98ebe2710bac20f1ba9f1be2df84cfb275ec1def7b6ad3c17773bcbc6ed6cd2": {
+    "sourceSql": "INSERT INTO email_codes(email, code_hash, expires_at, attempts, created_at, pending_password_hash) VALUES(?,?,?,0,?,?)\n      ON CONFLICT(email) DO UPDATE SET code_hash=excluded.code_hash, expires_at=excluded.expires_at, attempts=0, created_at=excluded.created_at, pending_password_hash=excluded.pending_password_hash",
+    "sql": "INSERT INTO email_codes(email, code_hash, expires_at, attempts, created_at, pending_password_hash) VALUES($1,$2,$3,0,$4,$5)\n      ON CONFLICT(email) DO UPDATE SET code_hash=excluded.code_hash, expires_at=excluded.expires_at, attempts=0, created_at=excluded.created_at, pending_password_hash=excluded.pending_password_hash",
+    "parameterCount": 5,
+    "returnsId": false
+  },
+  "96965a54ead9f0f49890d938889341c3d40917e753479a09a738faff0722492c": {
+    "sourceSql": "SELECT * FROM email_codes WHERE email=?",
+    "sql": "SELECT * FROM email_codes WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "40470644023f67009bae82f46b72b8617fd41e7738e99957413d2da738507cbc": {
+    "sourceSql": "UPDATE email_codes SET attempts=attempts+1 WHERE email=?",
+    "sql": "UPDATE email_codes SET attempts=attempts+1 WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "dfc1be4703035ca9ee5361c075366732ca2b3f3a33aa1e5aef516a99d81ec3e7": {
+    "sourceSql": "INSERT INTO users(email, display_name, email_verified, created_at, last_login_at, password_hash) VALUES(?,?,1,?,?,?)",
+    "sql": "INSERT INTO users(email, display_name, email_verified, created_at, last_login_at, password_hash) VALUES($1,$2,1,$3,$4,$5)",
+    "parameterCount": 5,
+    "returnsId": true
+  },
+  "30dc3847e109a47de3e61929a1c569f3a95e916f046dea4d57f22d79637d3ab4": {
+    "sourceSql": "INSERT INTO password_reset_tokens(email, token_hash, expires_at, created_at) VALUES(?,?,?,?)\n      ON CONFLICT(email) DO UPDATE SET token_hash=excluded.token_hash, expires_at=excluded.expires_at, created_at=excluded.created_at",
+    "sql": "INSERT INTO password_reset_tokens(email, token_hash, expires_at, created_at) VALUES($1,$2,$3,$4)\n      ON CONFLICT(email) DO UPDATE SET token_hash=excluded.token_hash, expires_at=excluded.expires_at, created_at=excluded.created_at",
+    "parameterCount": 4,
+    "returnsId": false
+  },
+  "adcc98a3d6fac55b609f3a5f740d631f55c3b8fd2122d5826decf635c8eb0125": {
+    "sourceSql": "SELECT * FROM password_reset_tokens WHERE email=?",
+    "sql": "SELECT * FROM password_reset_tokens WHERE email=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "161e4265b8b74fa2c367ffb692b0f90ac18d735f613a8975598a58f325664d75": {
+    "sourceSql": "SELECT id FROM users WHERE email=? AND email_verified=1",
+    "sql": "SELECT id FROM users WHERE email=$1 AND email_verified=1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "89ec6cb67c0b1d292fe38a853c3aa6f040acb2c3d3f8e02579849f9f5bbf0e26": {
+    "sourceSql": "DELETE FROM password_reset_tokens WHERE email=? AND token_hash=? AND expires_at>?",
+    "sql": "DELETE FROM password_reset_tokens WHERE email=$1 AND token_hash=$2 AND expires_at>$3",
+    "parameterCount": 3,
+    "returnsId": false
+  },
+  "00011b30ce8cb9f9177dbeda173baf4fc37cf041580d779321a547e5325b03ec": {
+    "sourceSql": "SELECT 1 FROM games WHERE slug=?",
+    "sql": "SELECT 1 FROM games WHERE slug=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "28cef10f923986b0e2f1ac6e9b2ffcda68924eaf86edd94edc3a4241bd3760a2": {
+    "sourceSql": "INSERT INTO games(slug,title,description,tags_json,capsule_path,entry_path,min_players,max_players,status,created_at,updated_at,\n      description_ru,description_en,tags_ru_json,tags_en_json,runtime_type,archive_bytes)\n      VALUES(?,?,?,?,?,'index.html',1,1,'draft',?,?,?,?,?,?,?,?)",
+    "sql": "INSERT INTO games(slug,title,description,tags_json,capsule_path,entry_path,min_players,max_players,status,created_at,updated_at,\n      description_ru,description_en,tags_ru_json,tags_en_json,runtime_type,archive_bytes)\n      VALUES($1,$2,$3,$4,$5,'index.html',1,1,'draft',$6,$7,$8,$9,$10,$11,$12,$13)",
+    "parameterCount": 13,
+    "returnsId": true
+  },
+  "f654c9e7db9fdcaa52884b3d22b122630ffe85ffb29e21d799b27b1d58885b42": {
+    "sourceSql": "SELECT * FROM games WHERE id=?",
+    "sql": "SELECT * FROM games WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "5b4c3bd87982879189ceade90167cd685db1604639eec6372e406dd4b08dfe8f": {
+    "sourceSql": "SELECT * FROM games WHERE slug=?",
+    "sql": "SELECT * FROM games WHERE slug=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "3945ce9224ee861cb84a9165070851366278e4ca79f38a8c00201f3ab1d0f082": {
+    "sourceSql": "INSERT INTO game_events(game_id,user_id,guest_id,event_type,source,metadata_json,created_at)\n    VALUES(?,?,?,?,?,?,?)",
+    "sql": "INSERT INTO game_events(game_id,user_id,guest_id,event_type,source,metadata_json,created_at)\n    VALUES($1,$2,$3,$4,$5,$6,$7)",
+    "parameterCount": 7,
+    "returnsId": true
+  },
+  "40c52e385015448d08d543d7533a5f2cf00971f6593206ef4903982380a7191c": {
+    "sourceSql": "INSERT INTO play_sessions(id,game_id,user_id,guest_id,started_at,last_seen_at,source,is_active)\n    VALUES(?,?,?,?,?,?,?,1)",
+    "sql": "INSERT INTO play_sessions(id,game_id,user_id,guest_id,started_at,last_seen_at,source,is_active)\n    VALUES($1,$2,$3,$4,$5,$6,$7,1)",
+    "parameterCount": 7,
+    "returnsId": false
+  },
+  "c8b3ab505b5dabbaf4a0600dbf5e45099a0c23e224db9866613f399d458dc770": {
+    "sourceSql": "SELECT * FROM play_sessions WHERE id=?",
+    "sql": "SELECT * FROM play_sessions WHERE id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "22f10b78694b91a237bbaf1b5a4fe9d69dddfd77b9fde199c8c722c7cf8046ec": {
+    "sourceSql": "UPDATE play_sessions SET last_seen_at=?, duration_seconds=?, is_active=?, ended_at=CASE WHEN ? THEN COALESCE(ended_at,?) ELSE ended_at END WHERE id=?",
+    "sql": "UPDATE play_sessions SET last_seen_at=$1, duration_seconds=$2, is_active=$3, ended_at=CASE WHEN $4 <> 0 THEN COALESCE(ended_at,$5) ELSE ended_at END WHERE id=$6",
+    "parameterCount": 6,
+    "returnsId": false
+  },
+  "d578ae4b6c8646855793bb87b4aafc9de78ae447ab83d30f15589879ba42cf9a": {
+    "sourceSql": "SELECT * FROM games WHERE status='published' ORDER BY published_at DESC",
+    "sql": "SELECT * FROM games WHERE status='published' ORDER BY published_at DESC",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "e51b500998e8c3d43132f83d9414faf180f13476dccd7ff11f5133307a9d7417": {
+    "sourceSql": "SELECT * FROM games ORDER BY created_at DESC",
+    "sql": "SELECT * FROM games ORDER BY created_at DESC",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "4d79f83dedd906b5354842647abb6134235d2afbc987bdb455bc2edb59586658": {
+    "sourceSql": "SELECT g.id,g.slug,g.title,g.description,g.description_ru,g.description_en,g.tags_json,g.tags_ru_json,g.tags_en_json,g.capsule_path,g.min_players,g.max_players,\n      MAX(p.started_at) AS lastPlayed, SUM(p.duration_seconds) AS playSeconds, COUNT(p.id) AS sessions\n    FROM play_sessions p JOIN games g ON g.id=p.game_id WHERE p.user_id=? AND g.status='published'\n    GROUP BY g.id ORDER BY lastPlayed DESC",
+    "sql": "SELECT g.id,g.slug,g.title,g.description,g.description_ru,g.description_en,g.tags_json,g.tags_ru_json,g.tags_en_json,g.capsule_path,g.min_players,g.max_players,\n      MAX(p.started_at) AS lastPlayed, SUM(p.duration_seconds) AS playSeconds, COUNT(p.id) AS sessions\n    FROM play_sessions p JOIN games g ON g.id=p.game_id WHERE p.user_id=$1 AND g.status='published'\n    GROUP BY g.id ORDER BY lastPlayed DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "770b0efe4d2f7b477dedba72be1c5c6c2804829ce37c09234349d644accf53f1": {
+    "sourceSql": "SELECT g.id,g.slug,g.title,g.description,g.description_ru,g.description_en,g.tags_json,g.tags_ru_json,g.tags_en_json,g.capsule_path,g.min_players,g.max_players, f.created_at AS lastPlayed\n    FROM favorites f JOIN games g ON g.id=f.game_id WHERE f.user_id=? AND g.status='published' ORDER BY f.created_at DESC",
+    "sql": "SELECT g.id,g.slug,g.title,g.description,g.description_ru,g.description_en,g.tags_json,g.tags_ru_json,g.tags_en_json,g.capsule_path,g.min_players,g.max_players, f.created_at AS lastPlayed\n    FROM favorites f JOIN games g ON g.id=f.game_id WHERE f.user_id=$1 AND g.status='published' ORDER BY f.created_at DESC",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "0da5adf638147d6cefe7ba7307c2786dc80aacb5f38eeeedfa001550cf617922": {
+    "sourceSql": "SELECT id,public_id,display_name,email,avatar_url,created_at FROM users WHERE email_verified=1",
+    "sql": "SELECT id,public_id,display_name,email,avatar_url,created_at FROM users WHERE email_verified=1",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "4d355290510005b2cb37507e65e67b169aac15eddc3f4f80dadafbd63fc72793": {
+    "sourceSql": "SELECT COALESCE(SUM(duration_seconds),0) AS seconds,COUNT(DISTINCT game_id) AS games,COUNT(*) AS sessions FROM play_sessions WHERE user_id=?",
+    "sql": "SELECT COALESCE(SUM(duration_seconds),0) AS seconds,COUNT(DISTINCT game_id) AS games,COUNT(*) AS sessions FROM play_sessions WHERE user_id=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "5f8c870e1b0ee7a68709511fec5aa4e5199951df21cc4e27ef6c5ed8df78f555": {
+    "sourceSql": "SELECT game_id,MAX(LENGTH(body)) AS longest FROM reviews WHERE user_id=? AND is_admin_reply=0 AND parent_id IS NULL GROUP BY game_id",
+    "sql": "SELECT game_id,MAX(LENGTH(body)) AS longest FROM reviews WHERE user_id=$1 AND is_admin_reply=0 AND parent_id IS NULL GROUP BY game_id",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "43eff80c2af7e9d1d83fc38e5f4c54fb12ed0ec368568aa45f78fdbe4b816d07": {
+    "sourceSql": "SELECT COUNT(DISTINCT game_id) AS n FROM game_events WHERE user_id=? AND event_type='favorite_added'",
+    "sql": "SELECT COUNT(DISTINCT game_id) AS n FROM game_events WHERE user_id=$1 AND event_type='favorite_added'",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "2465e0a316b19f231a7055fbc9192a88f800b97190d13fe22864f019204f6103": {
+    "sourceSql": "SELECT COUNT(DISTINCT game_id) AS n FROM game_events WHERE user_id=? AND event_type='game_shared'",
+    "sql": "SELECT COUNT(DISTINCT game_id) AS n FROM game_events WHERE user_id=$1 AND event_type='game_shared'",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "c1dfa73227f935d0d3e03cedda5bfb8dd74770978c55c1f3af39229c20fb1e80": {
+    "sourceSql": "SELECT game_id,user_id,guest_id FROM play_sessions WHERE ended_at IS NULL AND is_active=1 AND last_seen_at>=?",
+    "sql": "SELECT game_id,user_id,guest_id FROM play_sessions WHERE ended_at IS NULL AND is_active=1 AND last_seen_at>=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "280b99435d2207d7f02fa9e28c739fa1b1d88d5fb847b223707157def391222c": {
+    "sourceSql": "SELECT COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) AS n FROM play_sessions WHERE substr(started_at,1,10)=?",
+    "sql": "SELECT COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) AS n FROM play_sessions WHERE substr(started_at,1,10)=$1",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "1d1af7ef33b717f8139aab31e243305e1e422b7babef65e36ce2ddf772376ad6": {
+    "sourceSql": "SELECT COUNT(*) AS sessions,COALESCE(SUM(duration_seconds),0) AS seconds FROM play_sessions",
+    "sql": "SELECT COUNT(*) AS sessions,COALESCE(SUM(duration_seconds),0) AS seconds FROM play_sessions",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "f66d28bc145df6a5de90ce2bd6c013ea07d506cfc8059ac4e201b4d8fe295a5e": {
+    "sourceSql": "SELECT id FROM games WHERE status='published'",
+    "sql": "SELECT id FROM games WHERE status='published'",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "9e871794e7b386d4aa4a7d6c49529125c5b1e699dce8b17eb6feaa08fb45bc76": {
+    "sourceSql": "SELECT bucket_at AS at,ccu FROM metric_snapshots WHERE period='minute' AND scope_key='platform' AND bucket_at>=? ORDER BY bucket_at",
+    "sql": "SELECT bucket_at AS at,ccu FROM metric_snapshots WHERE period='minute' AND scope_key='platform' AND bucket_at>=$1 ORDER BY bucket_at",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "8386a576533bfb64d3e05925daf6b33fa02028eb2cb19045f4f76c8549940f81": {
+    "sourceSql": "SELECT s.bucket_at AS at,s.game_id,s.ccu,g.slug,g.title FROM metric_snapshots s JOIN games g ON g.id=s.game_id WHERE s.period='minute' AND s.scope_key LIKE 'game:%' AND s.bucket_at>=? ORDER BY s.bucket_at",
+    "sql": "SELECT s.bucket_at AS at,s.game_id,s.ccu,g.slug,g.title FROM metric_snapshots s JOIN games g ON g.id=s.game_id WHERE s.period='minute' AND s.scope_key LIKE 'game:%' AND s.bucket_at>=$1 ORDER BY s.bucket_at",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "34622a7dc953279fcb23db8ffeafa987b72d2ce173891e71d9416ab417d30f06": {
+    "sourceSql": "SELECT substr(started_at,1,10) AS day, COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) AS players FROM play_sessions WHERE substr(started_at,1,10)>=? GROUP BY substr(started_at,1,10) ORDER BY day",
+    "sql": "SELECT substr(started_at,1,10) AS day, COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) AS players FROM play_sessions WHERE substr(started_at,1,10)>=$1 GROUP BY substr(started_at,1,10) ORDER BY day",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "5fc7605e787b8c411ea941eb53dba34f418ae9b387143c1bd8eedac831a7e67c": {
+    "sourceSql": "SELECT ccu FROM metric_snapshots WHERE period='minute' AND scope_key='platform' ORDER BY bucket_at DESC LIMIT 1",
+    "sql": "SELECT ccu FROM metric_snapshots WHERE period='minute' AND scope_key='platform' ORDER BY bucket_at DESC LIMIT 1",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "20c57e568b6b05828ba2d2ea7f1569489ae1ac4e4282c9c757677e35aac1b803": {
+    "sourceSql": "SELECT ps.game_id,g.slug,g.title,COUNT(DISTINCT CASE WHEN ps.user_id IS NOT NULL THEN 'u:'||ps.user_id ELSE 'g:'||ps.guest_id END) AS players FROM play_sessions ps JOIN games g ON g.id=ps.game_id WHERE substr(ps.started_at,1,10)=? GROUP BY ps.game_id,g.slug,g.title",
+    "sql": "SELECT ps.game_id,g.slug,g.title,COUNT(DISTINCT CASE WHEN ps.user_id IS NOT NULL THEN 'u:'||ps.user_id ELSE 'g:'||ps.guest_id END) AS players FROM play_sessions ps JOIN games g ON g.id=ps.game_id WHERE substr(ps.started_at,1,10)=$1 GROUP BY ps.game_id,g.slug,g.title",
+    "parameterCount": 1,
+    "returnsId": false
+  },
+  "f5508781f96cf1564386c248bb4e64708a4c01ebcd4f10023f4f425ae7035c1f": {
+    "sourceSql": "SELECT id,slug,title FROM games WHERE status='published'",
+    "sql": "SELECT id,slug,title FROM games WHERE status='published'",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "16ee8d132588a261f1aae19ed5415a270ecea9b819658a27e0975bc69c3c8f85": {
+    "sourceSql": "SELECT id FROM games",
+    "sql": "SELECT id FROM games",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "1bfab959c14d5d0ff7d8e535a99439ee09672d473c2773905e1394e8de92c32d": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM users",
+    "sql": "SELECT COUNT(*) AS n FROM users",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "df4c664624d2b53e7dfbec745765eaa8d817cc9bd91d04a1dfad07455ce43655": {
+    "sourceSql": "SELECT COUNT(*) AS n,COALESCE(SUM(duration_seconds),0) AS seconds FROM play_sessions",
+    "sql": "SELECT COUNT(*) AS n,COALESCE(SUM(duration_seconds),0) AS seconds FROM play_sessions",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "0cf8459e0666cb4b2ac4c367cd1c0442b0f50e75a9b32ac3a2bfc6cd49130059": {
+    "sourceSql": "SELECT COUNT(*) AS n,ROUND(AVG(rating),2) AS avg FROM ratings",
+    "sql": "SELECT COUNT(*) AS n,ROUND(AVG(rating),2) AS avg FROM ratings",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "2bad89281d9d1f545e9f4d35cd304de241730d8d5414d5449e3e2de615e0f19a": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM reviews WHERE parent_id IS NULL",
+    "sql": "SELECT COUNT(*) AS n FROM reviews WHERE parent_id IS NULL",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "0ec908c34129b84024aff5835d5aa7109872e051579217373565f410e1738e8c": {
+    "sourceSql": "SELECT COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) AS n FROM play_sessions",
+    "sql": "SELECT COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) AS n FROM play_sessions",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "0cd00b1e8f41fea90505df4ca0ac6af10d466ed81d0a9d28d2502b0c1a766a8d": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM games WHERE status='published'",
+    "sql": "SELECT COUNT(*) AS n FROM games WHERE status='published'",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "e8b9f7150983bcfeffdf55628988f380fd17502f7f4726e1124c5572af8b852d": {
+    "sourceSql": "SELECT COUNT(*) AS n FROM games WHERE status='draft'",
+    "sql": "SELECT COUNT(*) AS n FROM games WHERE status='draft'",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "2d15038fef9232fb5832bdd809043db81ad69c53e59c9c77679537b2eccc61b9": {
+    "sourceSql": "SELECT event_type,COUNT(*) AS n FROM game_events WHERE event_type IN ('level_start','level_complete') GROUP BY event_type",
+    "sql": "SELECT event_type,COUNT(*) AS n FROM game_events WHERE event_type IN ('level_start','level_complete') GROUP BY event_type",
+    "parameterCount": 0,
+    "returnsId": false
+  },
+  "6bdac3d2b401b1e6ba37a0c8ad5b9a5711210733ac1a1e53360e6a8f1d8c1968": {
+    "sourceSql": "SELECT\n  (SELECT COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) FROM play_sessions WHERE game_id=?) AS unique_players,\n  (SELECT COUNT(*) FROM play_sessions WHERE game_id=?) AS sessions,\n  (SELECT COALESCE(SUM(duration_seconds),0) FROM play_sessions WHERE game_id=?) AS total_play_seconds,\n  (SELECT ROUND(AVG(rating)::numeric,2) FROM ratings WHERE game_id=?) AS average_rating,\n  (SELECT COUNT(*) FROM ratings WHERE game_id=?) AS ratings_count,\n  (SELECT COUNT(*) FROM reviews WHERE game_id=? AND parent_id IS NULL) AS reviews_count,\n  (SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY duration_seconds) FROM play_sessions WHERE game_id=? AND duration_seconds>0) AS median_seconds,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=? AND event_type IN ('game_click','custom_click')) AS clicks,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=? AND event_type='catalog_click') AS catalog_clicks,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=? AND event_type='game_open' AND source='external') AS external_referrals,\n  (SELECT COUNT(*) FROM favorites WHERE game_id=?) AS favorites,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=? AND event_type='game_shared') AS share_events,\n  (SELECT COUNT(DISTINCT COALESCE('u:'||user_id,'g:'||guest_id)) FROM game_events WHERE game_id=? AND event_type='game_shared') AS shared_players",
+    "sql": "SELECT\n  (SELECT COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN 'u:'||user_id ELSE 'g:'||guest_id END) FROM play_sessions WHERE game_id=$1) AS unique_players,\n  (SELECT COUNT(*) FROM play_sessions WHERE game_id=$2) AS sessions,\n  (SELECT COALESCE(SUM(duration_seconds),0) FROM play_sessions WHERE game_id=$3) AS total_play_seconds,\n  (SELECT ROUND(AVG(rating)::numeric,2) FROM ratings WHERE game_id=$4) AS average_rating,\n  (SELECT COUNT(*) FROM ratings WHERE game_id=$5) AS ratings_count,\n  (SELECT COUNT(*) FROM reviews WHERE game_id=$6 AND parent_id IS NULL) AS reviews_count,\n  (SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY duration_seconds) FROM play_sessions WHERE game_id=$7 AND duration_seconds>0) AS median_seconds,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=$8 AND event_type IN ('game_click','custom_click')) AS clicks,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=$9 AND event_type='catalog_click') AS catalog_clicks,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=$10 AND event_type='game_open' AND source='external') AS external_referrals,\n  (SELECT COUNT(*) FROM favorites WHERE game_id=$11) AS favorites,\n  (SELECT COUNT(*) FROM game_events WHERE game_id=$12 AND event_type='game_shared') AS share_events,\n  (SELECT COUNT(DISTINCT COALESCE('u:'||user_id,'g:'||guest_id)) FROM game_events WHERE game_id=$13 AND event_type='game_shared') AS shared_players",
+    "parameterCount": 13,
+    "returnsId": false
+  },
+  "34f8b0d1b675e51bbaa19ab738bcf21d38ddfa1a33c3788452c1bd5c0c1f8842": {
+    "sourceSql": "INSERT INTO metric_snapshots(period,bucket_at,scope_key,game_id,ccu,daily_players,sessions,total_seconds)\n    VALUES('minute',?,?,?,?,?,?,?) ON CONFLICT(period,bucket_at,scope_key) DO UPDATE SET\n    game_id=excluded.game_id,ccu=excluded.ccu,daily_players=excluded.daily_players,sessions=excluded.sessions,total_seconds=excluded.total_seconds",
+    "sql": "INSERT INTO metric_snapshots(period,bucket_at,scope_key,game_id,ccu,daily_players,sessions,total_seconds)\n    VALUES('minute',$1,$2,$3,$4,$5,$6,$7) ON CONFLICT(period,bucket_at,scope_key) DO UPDATE SET\n    game_id=excluded.game_id,ccu=excluded.ccu,daily_players=excluded.daily_players,sessions=excluded.sessions,total_seconds=excluded.total_seconds",
+    "parameterCount": 7,
+    "returnsId": false
+  }
+}

@@ -1,0 +1,96 @@
+SUPER CUBE Games Platform — handoff summary
+Updated: 2026-10-11
+
+Purpose
+Self-hosted browser-game platform: public catalogue, one administrator, ZIP upload, private draft/testing, publishing, player accounts, ratings/reviews/favorites/cloud saves, game SDK, public player leaderboard, admin metrics and isolated server-game runtime via dedicated `game-runtime` service (only that service mounts Docker socket; Platform API uses token-authenticated internal HTTP).
+
+Current stack and architecture
+- Node.js >=20, Express 4, vanilla HTML/CSS/JS.
+- Platform API: server.js, port 3000. Business logic and permissions stay here; it has no PostgreSQL driver.
+- Internal Data API: data-service/server.js, default port 4001. Only this service imports pg and accesses PostgreSQL.
+- Data API calls use SHA-256 statement IDs, request mode and bound parameters. SQL is allowlisted in data-service/query-catalog.json; arbitrary SQL text is never accepted over HTTP. Internal calls require DATA_API_TOKEN. /internal/v1/batch executes up to 100 statements in a PostgreSQL transaction.
+- PostgreSQL 16 schema: data-service/schema.sql, tables users, identities, games, play_sessions, game_events, ratings, reviews, favorites, cloud_saves, email_codes, metric_snapshots, app_sessions.
+- shared/data-client.js implements the Platform API client; shared/data-api-session-store.js backs Express sessions in PostgreSQL.
+- docker-compose.yml runs postgres, private data-api, and platform. Data API has no host port. PostgreSQL is mapped only to 127.0.0.1 for local migration tools. Platform does not receive DATABASE_URL / PostgreSQL credentials in Compose. Dockerfile builds the Platform API without pg; Dockerfile.data-api builds the minimal Data API image with pg.
+- Uploaded games, avatars and media still use the persistent platform-storage volume. S3/GCS object-storage adapter is not implemented yet. Docker game runtime still runs from the Platform API process; a separate restricted runtime-manager is a production follow-up.
+
+Useful files
+- README.md — setup, API, game ZIP layout, security, migration.
+- PROJECT_DESCRIPTION.md — scope and architecture decisions.
+- HANDOFF.md — detailed files, test status, and next actions.
+- .env.example — config template; create .env and replace all placeholder secrets.
+- scripts/build-query-catalog.mjs — generates query allowlist.
+- scripts/export-sqlite.py and scripts/import-sqlite-export.mjs — manual migration from legacy SQLite storage/platform.sqlite.
+- examples/pocket-clicker.zip — browser game SDK example.
+- examples/durak-online.zip — server game example for 2-6 players.
+
+Start
+1. cp .env.example .env
+2. Set SESSION_SECRET, OTP_PEPPER, DATA_API_TOKEN (at least 32 random characters), POSTGRES_PASSWORD and ADMIN_EMAIL.
+3. docker compose up --build
+4. Open http://localhost:3000/; health-check is http://localhost:3000/health.
+
+To start processes outside Compose, start PostgreSQL, set DATABASE_URL to localhost, run npm install, then run npm run start:data and npm start in separate terminals. Platform API waits for Data API health. Do not expose Data API publicly. Never commit .env or migration exports.
+
+SQLite migration
+1. Stop writes to the legacy platform.
+2. python scripts/export-sqlite.py storage/platform.sqlite migration-export.json
+3. Start PostgreSQL / Data API and run node scripts/import-sqlite-export.mjs migration-export.json with DATABASE_URL targeting the reachable PostgreSQL host.
+4. Compare row counts and metrics before switching; remove the JSON export safely. Sessions are intentionally not migrated, so players may need to sign in again.
+
+Verification status
+- npm run check: syntax checks passed in the editing environment.
+- npm run build:data-catalog: 94 registered query statements; SHA identifiers and placeholder counts were checked.
+- Data API client mock-protocol and query registry tests are added as npm run test:unit; run them after dependencies are installed.
+- Full PostgreSQL/Data API/Compose run was not possible in editing environment because npm install timed out and Docker/PostgreSQL are not installed. Do not claim end-to-end runtime verification until docker compose up --build, npm run smoke, upload/publish and profile/SDK scenarios pass.
+- Email identity insertion is idempotent for PostgreSQL: repeat email-code login must reuse the existing `identities` mapping instead of treating PG error `23505` as a SQLite `UNIQUE` message. This was covered by static architecture assertions; end-to-end login still requires real services.
+- SMTP requires real credentials and outbound network access. Server games require Docker runtime; do not mount docker.sock into a public production API without a separate, restricted manager.
+
+Next
+1. Install dependencies and run npm test.
+2. Start Compose; verify health of all 3 services and run npm run smoke.
+3. Test SQLite export/import on a copy of any real legacy database.
+4. Test upload -> draft -> private test -> publish -> catalogue, reviews, favorites/share, cloud saves, analytics and server-game Docker lifecycle.
+5. Add future schema changes as numbered/checksummed migrations; implement object storage (S3/GCS), a restricted runtime-manager, backup restore tests, monitor/alerts, privacy policy and terms.
+
+
+Latest fixes (2026-10-11)
+- Login page separates Sign in and Create account. Email OTP has mode binding and a resend/new-code action that replaces the prior challenge; no database wipe is needed to reset a stuck/expired code.
+- Data query catalogue generated with 94 statements. Identity INSERT uses ON CONFLICT DO NOTHING without implicit RETURNING id.
+- Game host uses canonical route slug and removes `src` from the URL after capturing analytics source; cloud saves use the immutable server-provided game slug. Query params must not make a separate game or save slot.
+- `npm test` passed (syntax, query-catalog validation, mocked Data API, architecture invariants, auth/game contract checks). Live SMTP/PostgreSQL/browser E2E remains unverified in the authoring environment.
+- To force deployment of updated logic and catalog, keep `.env`/PostgreSQL volumes, then `docker compose build --no-cache platform data-api` and `docker compose up -d --force-recreate platform data-api`.
+
+
+Runtime manager update: Platform API no longer invokes the Docker CLI directly. Compose includes a dedicated `game-runtime` service (`Dockerfile.runtime`, `runtime-service/server.js`) that owns Docker CLI/socket and offers a token-protected internal API. Add `SERVER_GAME_RUNTIME_TOKEN` to the existing `.env` before upgrading; keep the existing PostgreSQL and platform-storage volumes. Run `docker compose up -d --build game-runtime platform` and verify with `docker compose exec game-runtime docker info`. `npm test` passes, but Docker Desktop socket behavior needs live testing.
+
+Runtime diagnostic fix: game ZIP files are written mode 0640 but isolated game containers run as UID 10001. The runtime manager now chmods only the per-game copy to a+rX, captures logs before failed-container cleanup, and propagates development diagnostics through Platform API. `npm test` passes; Docker Engine integration still needs running Docker Desktop. Rebuild/recreate only game-runtime and platform; do not delete volumes.
+
+
+## UI polish revision (2026-10-11)
+- Play CTA buttons no longer use arrow glyphs and use the light-green selection accent.
+- Admin ZIP upload/replacement now shows byte-based XHR progress, displays server-side archive processing after transfer, and warns before navigation while upload/processing is pending.
+- Email registration/login is available; generic Back links use same-origin browser history when possible.
+- Leaderboard scoring help appears on hover/focus and supports click/touch.
+- SDK remains a standalone /sdk.html page with RU/EN browser/server tabs, code examples and prompts for new games and existing-ZIP conversion. Documentation links to it from the contents, tools section and footer.
+- Validation: npm test passes, including syntax checks and the new UI regression test, plus existing Data API/auth/runtime/proxy test suites. Full browser/Docker integration was not run.
+
+
+Admin dashboard/SDK update (2026-10-11)
+- SDK is a standalone bilingual page at /sdk.html; Documentation links to it in the TOC, tools section and footer. It is not embedded in documentation. The documentation header excludes Catalog/Leaderboard links.
+- Admin metrics dashboard has Games and Platform status tabs, movable/collapsible/hideable widgets with localStorage layout, fixed-height scrollable logs, unique-players-today per-game pie chart with hover/focus information, and a platform/game errors widget.
+- Monitoring content is refreshed after language changes. Admin email is not shown in the workspace or player leaderboard details. Game title and type are separate table columns. Play/Share actions are below the game capsule in the game modal.
+- Note: latest Platform API errors are held in memory and reset on restart; dashboard is not a replacement for full Docker stdout/stderr logs.
+- Validation: npm test passes; full browser and Docker live testing was not available in the authoring environment.
+
+Latest dashboard/docs work (2026-10-11)
+- Metrics UI: two-column landscape, touch-friendly pointer drag grips, collapse/hide/restore persistence, no reset button; pie chart is unique players today by game; platform CCU history separate; daily unique player trends include last 7 days; median/rating game/tag filters.
+- Documentation has separate API reference tab with expandable examples for endpoints and request types. SDK remains standalone at /sdk.html with per-method expanders and a complete clicker demo; documentation links to it.
+- Early theme bootstrap avoids dark-mode FOUC; catalogue filters persist; favourite toasts and support submission UX refined.
+- `npm test` passes. Browser/Docker live end-to-end not verified. Next: define OpenAPI 3.1 as contract source of truth, persist structured API errors, add retention/alerts, and run touch-browser regression tests.
+
+
+LATEST PATCH — 2026-10-11 (header / dashboard title width)
+- Dashboard widget titles no longer share a grid track with action buttons. DOM has separate heading and controls wrappers; on mobile controls move beneath the title.
+- Header nav and actions are normalized to a right-aligned intrinsic-width group; at <=760px a hamburger toggles a dropdown, closed by navigation, Escape or outside click. Labels localize RU/EN.
+- `npm test` passes. Browser/device visual validation remains to be performed after deployment.

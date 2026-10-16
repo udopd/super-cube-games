@@ -1,0 +1,2 @@
+ALTER TABLE support_tickets RENAME TO archived_support_tickets;
+ALTER INDEX idx_support_tickets_status_created RENAME TO idx_archived_support_tickets_status_created;

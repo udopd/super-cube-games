@@ -1,0 +1,15 @@
+SUPER CUBE PLATFORM — HEADER / DASHBOARD LAYOUT PATCH
+Date: 2026-10-11
+
+Changes:
+1. Dashboard widget headings now use a dedicated .dashboard-widget-heading wrapper; buttons are isolated in .dashboard-widget-controls. Desktop uses a flexible title column and compact actions. Mobile places controls on a second row so the heading remains the dominant content.
+2. Shared headers are normalized by public/js/common.js into a right-aligned .header-menu-content. At desktop widths it sizes to its contents. At <=760px it becomes a dropdown controlled by an accessible hamburger button.
+3. Mobile menu closes on link navigation, Escape, and outside pointer interaction. Toggle aria-label/title follows RU/EN language changes.
+4. Added regression tests for the header-menu and dashboard-widget structure.
+
+Deploy:
+- Replace the project files with this archive while preserving .env and Docker volumes.
+- From the project root run: docker compose up -d --build --force-recreate platform
+- Validate: docker compose ps; docker compose logs --tail=100 platform
+
+Validation: npm test passed in this workspace. A real browser test against Docker Desktop was not available, so verify the desktop header, 760px breakpoint, mobile dropdown, and widget title widths after deployment.

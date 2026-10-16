@@ -1,0 +1,118 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-supercube}
+      POSTGRES_USER: ${POSTGRES_USER:-supercube}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+      start_period: 5s
+
+  data-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.data-api
+    restart: unless-stopped
+    command: ["node", "data-service/server.js"]
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATA_API_PORT: 4001
+      DATA_API_TOKEN: ${DATA_API_TOKEN:?Set DATA_API_TOKEN in .env}
+      DATA_API_POOL_MAX: ${DATA_API_POOL_MAX:-15}
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:-supercube}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATABASE: ${POSTGRES_DB:-supercube}
+      DATABASE_SSL: ${DATABASE_SSL:-0}
+      DATABASE_SSL_REJECT_UNAUTHORIZED: ${DATABASE_SSL_REJECT_UNAUTHORIZED:-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+      start_period: 10s
+    expose:
+      - "4001"
+
+  game-runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile.runtime
+    container_name: super-cube-game-runtime
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      SERVER_GAME_RUNTIME_PORT: 4100
+      SERVER_GAME_RUNTIME_TOKEN: ${SERVER_GAME_RUNTIME_TOKEN:?Set SERVER_GAME_RUNTIME_TOKEN in .env}
+      SERVER_GAME_DOCKER_IMAGE: ${SERVER_GAME_DOCKER_IMAGE:-node:22-alpine}
+      SERVER_GAME_RUNTIME_CONTAINER_NAME: super-cube-game-runtime
+      PLATFORM_STORAGE_VOLUME_LABEL: platform-storage
+      PLATFORM_STORAGE_VOLUME_NAME: ${PLATFORM_STORAGE_VOLUME_NAME:-}
+    volumes:
+      - platform-storage:/app/storage:ro
+      # Required by the dedicated runtime manager only. Do not mount into Platform API.
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - "4100"
+    healthcheck:
+      test: ["CMD-SHELL", "docker info >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
+  platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["node", "server.js"]
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      BASE_URL: ${BASE_URL:-http://localhost:3000}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      STORAGE_DIR: /app/storage
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      DATA_API_URL: http://data-api:4001
+      DATA_API_TOKEN: ${DATA_API_TOKEN:?Set DATA_API_TOKEN in .env}
+      DATA_API_STARTUP_TIMEOUT_MS: ${DATA_API_STARTUP_TIMEOUT_MS:-30000}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-SUPER CUBE Games <no-reply@example.com>}
+      OTP_PEPPER: ${OTP_PEPPER:?Set OTP_PEPPER in .env}
+      SERVER_GAME_DOCKER_IMAGE: ${SERVER_GAME_DOCKER_IMAGE:-node:22-alpine}
+      SERVER_GAME_RUNTIME_URL: http://game-runtime:4100
+      SERVER_GAME_RUNTIME_TOKEN: ${SERVER_GAME_RUNTIME_TOKEN:?Set SERVER_GAME_RUNTIME_TOKEN in .env}
+    depends_on:
+      data-api:
+        condition: service_healthy
+      game-runtime:
+        condition: service_started
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - platform-storage:/app/storage
+
+volumes:
+  postgres-data:
+  platform-storage:

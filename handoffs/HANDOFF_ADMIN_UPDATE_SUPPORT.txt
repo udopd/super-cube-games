@@ -1,0 +1,34 @@
+SUPER CUBE PLATFORM — ADMIN UPDATE, RESPONSIVE UI, MONITORING, SDK, SUPPORT
+
+Base: runtime-proxy-fix platform ZIP from 2026-10-11.
+
+Implemented in this update:
+- Admin game list now has “Update game”. It uploads a ZIP to POST /api/admin/games/:slug/update.
+- Update stages the new archive as a temporary draft, swaps files into the existing slug, updates metadata and archive byte count, and keeps the existing game row id/status. Existing cloud_saves, play_sessions, ratings, reviews, favorites and game_events remain attached to the existing game id. Published server games are stopped and best-effort restarted after update.
+- Added PostgreSQL migration 002_support_tickets.sql for ticket inbox.
+- Logged-in users can open a support modal from the game page; the form captures topic, message, user/game identity, timestamp, browser UA and device dimensions.
+- Admin support inbox at /admin/support.html supports filtering by status, replies, status changes (open/waiting/resolved/archived), and mailto fallback.
+- Admin metrics includes monitoring cards for platform uptime/memory, server game runtime status and latest 100 application events. This is not a full Docker stdout/stderr viewer; container logs remain available via docker compose logs.
+- Added responsive safety CSS for admin tables, cards, action controls, modals and narrow viewports.
+- SDK page now separates browser/server guidance by anchors and documents recommended server game architecture.
+- Data API SQL allowlist rebuilt to 100 statements.
+
+Deploy:
+1. Keep .env and existing Docker volumes.
+2. Copy the project files over the existing project folder.
+3. Rebuild/recreate platform and data-api to apply the new migration and application code:
+   docker compose up -d --build --force-recreate data-api platform
+4. Check:
+   docker compose logs --tail=100 data-api platform
+5. Test updating a draft/test game first. Existing game id is preserved so player data remains attached.
+
+Verification:
+- npm test passed on this source tree on 2026-10-11.
+- Includes syntax checks and existing unit/architecture tests.
+- Full end-to-end test with a live PostgreSQL/Docker Desktop/browser was not performed here.
+
+Important limitations:
+- Update replaces all files for a game. Ensure new ZIP includes every asset, not only changed files.
+- For published server games, restart after update is best-effort; verify runtime health after publishing.
+- Monitoring shows DB application events and runtime status, not raw Docker logs. Use docker compose logs for raw service logs.
+- Ticket responses are saved in the admin inbox; email delivery is a mailto fallback from the admin UI, not server-side outbound email.

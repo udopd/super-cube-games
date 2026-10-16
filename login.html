@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html data-theme="light" lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <script>(()=>{try{const t=localStorage.getItem('supercube-theme');document.documentElement.dataset.theme=(t==='dark'||t==='light')?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const l=localStorage.getItem('supercube-lang');if(l==='ru'||l==='en')document.documentElement.lang=l}catch{}})();</script>
+  <meta content="width=device-width,initial-scale=1" name="viewport" />
+  <meta content="noindex,nofollow" name="robots" />
+  <meta name="referrer" content="same-origin" />
+  <title>Вход | SUPER CUBE Games</title>
+  <meta name="description" content="Войдите в SUPER CUBE Games или создайте аккаунт." />
+  <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+  <link href="/css/style.css" rel="stylesheet" />
+</head>
+<body>
+  <header class="topbar"><div class="container topbar-inner"><a class="brand" href="/">SUPER CUBE</a><div class="header-actions"><a class="text-link" data-history-back data-i18n="backCatalog" href="/">Назад</a><button class="control" id="languageToggle" type="button">RU</button><button class="control" id="themeToggle" type="button">◐</button></div></div></header>
+  <main class="container auth-layout">
+    <section class="auth-intro"><h1 data-i18n="authTitle">Твоя игровая<br />история.</h1><p data-i18n="authIntro">Войди, чтобы сохранять прогресс в облаке, собирать избранное, оставлять оценки и возвращаться к последним играм.</p><a class="text-link" data-history-back data-i18n="backCatalog" href="/">← Назад</a></section>
+    <section class="auth-card">
+      <h2 data-i18n="signInTitle">Войти или зарегистрироваться</h2>
+      <div aria-label="Тип действия" class="auth-mode-tabs" role="group"><button aria-pressed="true" class="auth-mode-tab active" data-i18n="loginTab" id="loginModeButton" type="button">Войти</button><button aria-pressed="false" class="auth-mode-tab" data-i18n="registerTab" id="registerModeButton" type="button">Создать аккаунт</button></div>
+      <form id="passwordLoginForm">
+        <div class="form-field"><label data-i18n="loginLabel" for="passwordLoginName">Логин или email</label><input autocomplete="username" class="field" id="passwordLoginName" placeholder="admin / you@example.com" required type="text" /></div>
+        <div class="form-field" style="margin-top:10px"><label data-i18n="passwordLabel" for="passwordLoginValue">Пароль</label><input autocomplete="current-password" class="field" id="passwordLoginValue" required type="password" /></div>
+        <button class="auth-button primary" data-i18n="passwordSignIn" type="submit">Войти</button>
+        <p class="small muted" id="passwordLoginMessage" aria-live="polite"></p>
+        <button class="text-link auth-forgot" id="forgotPasswordButton" data-i18n="forgotPassword" type="button">Забыли пароль?</button>
+      </form>
+      <form class="hidden" id="registerForm">
+        <div class="form-field"><label data-i18n="emailLabel" for="registerEmail">Электронная почта</label><input autocomplete="email" class="field" id="registerEmail" placeholder="you@example.com" required type="email" /></div>
+        <div class="form-field" style="margin-top:10px"><label data-i18n="passwordLabel" for="registerPassword">Пароль</label><input autocomplete="new-password" class="field" id="registerPassword" minlength="6" maxlength="128" required type="password" /></div>
+        <div class="password-strength" aria-live="polite"><div class="password-strength-track" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><div class="password-strength-fill" id="passwordStrengthFill"></div></div><span id="passwordStrengthLabel" class="small muted" data-i18n="passwordMinHint">Минимум 6 символов</span></div>
+        <label class="privacy-consent"><input id="privacyConsent" type="checkbox"><span><span data-i18n="privacyConsentPrefix">Я принимаю</span> <a href="/privacy-policy.html" target="_blank" rel="noreferrer" data-i18n="privacyPolicyLink">Политику конфиденциальности</a><span data-i18n="privacyConsentSuffix">.</span></span></label>
+        <button class="auth-button primary" data-i18n="registerSendCode" type="submit">Создать аккаунт</button>
+      </form>
+      <form class="hidden" id="emailVerifyForm">
+        <p class="small muted" data-i18n="registrationCodeHelp">Введите код из письма, чтобы подтвердить адрес и завершить регистрацию.</p>
+        <div class="form-field"><label data-i18n="codeLabel" for="codeInput">Код из письма</label><input autocomplete="one-time-code" class="field" id="codeInput" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="123456" required /></div>
+        <button class="auth-button primary" data-i18n="registerVerifyCode" id="verifyCodeButton" type="submit">Подтвердить и создать аккаунт</button>
+        <div class="auth-flow-actions"><button class="text-link" data-i18n="resendCode" id="resendCodeButton" type="button">Отправить новый код</button><button class="text-link" data-i18n="changeEmail" id="changeEmailButton" type="button">Изменить email</button></div>
+      </form>
+      <div class="hidden" id="forgotPasswordPanel">
+        <p class="small muted" data-i18n="forgotPasswordHelp">Отправим ссылку для смены пароля на адрес, указанный при регистрации.</p>
+        <form id="forgotPasswordForm"><div class="form-field"><label data-i18n="emailLabel" for="forgotEmail">Электронная почта</label><input autocomplete="email" class="field" id="forgotEmail" required type="email" /></div><button class="auth-button primary" data-i18n="sendResetLink" type="submit">Отправить ссылку</button></form>
+        <button class="text-link auth-forgot" id="backToLoginButton" data-i18n="backToLogin" type="button">Назад ко входу</button>
+      </div>
+      <div class="auth-message" id="authMessage" role="status" aria-live="polite"></div>
+      <p class="small muted" data-i18n="authPrivacy">Данные для входа защищены. Никому не сообщайте пароль.</p>
+    </section>
+  </main>
+  <script defer src="/js/common.js"></script><script defer src="/js/auth.js"></script>
+</body>
+</html>

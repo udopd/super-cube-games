@@ -1,0 +1,30 @@
+SUPER CUBE Games Platform — UI / dashboard / API reference handoff
+Date: 2026-10-11
+
+This package is based on the PostgreSQL + private Data API + dedicated game-runtime version. It includes the current platform code, the standalone developer SDK and revised documentation/metrics UI.
+
+Latest changes in this package
+- Metrics dashboard: two columns for landscape/tablet layouts and one for narrow portrait; movable grip supports pointer/touch sorting; move/collapse/hide/restore state persists in localStorage; no reset-layout button.
+- Dashboard game comparison pie: unique players today by game, with hover/focus tooltip. Current platform CCU is displayed separately in platform history. Daily players include the last-7-days graph. Median/rating comparison has game/tag filters and uses canonical English tags.
+- Widget titles, drag handles and action buttons are vertically aligned. Logs remain in bounded, independently scrollable containers. The error widget displays app/runtime error sources available to the current implementation.
+- Documentation `/documentation.html` has Project documentation and API reference tabs. Each endpoint route has expandable request examples, including cookie session + CSRF, JSON and multipart forms, OAuth browser redirects, pages/static assets and image URLs.
+- `/sdk.html` remains a standalone bilingual page. It includes Browser/Server sections, expandable examples for SDK methods, a complete small-clicker example and prompts for creating/adapting games. Documentation links to SDK; SDK content isn't embedded in the docs page.
+- Theme is initialized before first paint to avoid dark-theme white flash. Catalog filters persist in localStorage. Favourite toasts use “Added to favourites” and “Removed from favourites”. The support form popup closes after a successful submit and shows a toast.
+- Admin game table shows capsule left of title; game type is its own column; admin email is not displayed in the management UI.
+- `/public/js/documentation.js` auto-generates expandable examples for endpoint rows. The documentation explicitly marks OAuth callbacks/navigation, image/static resources, cookies and CSRF requirements.
+
+Validation performed
+- `npm test` passes: build query catalogue (101 allowlisted statements), syntax checks, query-catalog/client/data architecture/auth-game/runtime/proxy/UI regression tests.
+- Basic HTML parser check confirms one opening and one closing `<main>` on documentation, SDK, catalog, hero and metrics pages.
+- No real browser automation, live PostgreSQL/SMTP flow, or Docker Compose end-to-end run was available during authoring. Verify on target Docker Desktop after deploying.
+
+Deploy
+- Preserve the existing `.env` and Docker volumes.
+- From the project directory run `docker compose up -d --build --force-recreate platform` for this UI/docs change. If data-service query catalog or schema was changed in later updates, rebuild data-api as well; this release does not intentionally change schema.
+- Verify `docker compose ps` and `docker compose logs --tail=100 platform`.
+
+Recommended next steps
+1. Introduce OpenAPI 3.1 as the version-controlled source of truth; currently endpoint examples are authored in the docs page and should be contract-tested against route definitions.
+2. Persist structured application errors instead of only keeping a bounded in-memory buffer; introduce retention, redaction and alerting.
+3. Run browser/touch regression tests for dashboard widget sorting, dark theme early paint, star ratings, support form success, upload progress and catalog filter persistence.
+4. Perform live runtime-manager tests using Docker Desktop and at least two browser sessions for server-game room lifecycle and reconnection.
