@@ -1,44 +1,117 @@
 <!doctype html>
 <html lang="ru" data-theme="light">
+
 <head>
-  <meta charset="utf-8"><script>(()=>{try{const t=localStorage.getItem('supercube-theme');document.documentElement.dataset.theme=(t==='dark'||t==='light')?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const l=localStorage.getItem('supercube-lang');if(l==='ru'||l==='en')document.documentElement.lang=l;}catch{}})();</script><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <script>(() => { try { const t = localStorage.getItem('supercube-theme'); document.documentElement.dataset.theme = (t === 'dark' || t === 'light') ? t : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const l = localStorage.getItem('supercube-lang'); if (l === 'ru' || l === 'en') document.documentElement.lang = l; } catch { } })();</script>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Мой кабинет | SUPER CUBE Games</title>
-  <meta name="description" content="Личный кабинет игрока SUPER CUBE Games: профиль, недавние игры и история игрового времени.">
-  <meta name="robots" content="noindex,follow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/style.css">
+  <meta name="description"
+    content="Личный кабинет игрока SUPER CUBE Games: профиль, недавние игры и история игрового времени.">
+  <meta name="robots" content="noindex,follow">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="profile-page">
-  <header class="topbar"><div class="container topbar-inner">
-    <a class="brand" href="/">SUPER CUBE</a>
-    <nav class="nav"><a href="/" data-i18n="navCatalog">Каталог</a></nav>
-    <div class="header-actions"><button id="logoutButton" class="control" type="button" data-i18n="signOut">Выйти</button><button class="control" id="languageToggle" type="button">RU</button><button class="control" id="themeToggle" type="button">◐</button></div>
-  </div></header>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/">SUPER CUBE</a>
+      <nav class="nav" data-primary-nav aria-label="Main navigation"><a href="/" data-i18n="navCatalog">Каталог</a><a href="/favorites.html" data-favorites-nav data-i18n="favoritesNav">Мои игры</a><a href="/leaderboard.html" data-i18n="navLeaderboard">Топ игроков</a><a href="/profile.html" data-profile-nav data-i18n="myProfile">Мой профиль</a></nav>
+      <div class="header-actions"><button class="control" id="languageToggle" type="button">RU</button><button
+          class="control" id="themeToggle" type="button">◐</button></div>
+    </div>
+  </header>
   <main class="container main profile-main">
-    <section class="page-header profile-page-header"><h1 data-i18n="profileTitle">Мой кабинет</h1><p id="profileIdentity" class="muted">Загружаем профиль…</p></section>
-    <section class="panel profile-settings" id="profileSettings">
-      <div class="section-head"><div><h2 class="section-title" data-i18n="profileSettings">Настройки профиля</h2></div><p class="section-note" id="publicPlayerId">SC-…</p></div>
+    <section class="page-header profile-page-header">
+      <h1 data-i18n="profileTitle">Мой профиль</h1>
+      <p id="profileIdentity" class="muted">Загружаем профиль…</p>
+    </section>
+    <section class="panel profile-settings" id="profileSettings" aria-labelledby="profileSettingsTitle">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title" id="profileSettingsTitle" data-i18n="profileSettings">Профиль</h2>
+        </div>
+        <p class="section-note" id="publicPlayerId">SC-…</p>
+      </div>
       <div class="profile-settings-grid">
         <form id="avatarForm" class="profile-setting-card">
-          <div class="profile-setting-title"><span class="profile-setting-icon">◉</span><div><h3 data-i18n="profileAvatarTitle">Аватар</h3><p class="small muted" data-i18n="profileAvatarSub">Показывается рядом с твоими комментариями</p></div></div>
+          <div class="profile-setting-title">
+            <div>
+              <h3 data-i18n="profileAvatarTitle">Аватар</h3>
+            </div>
+          </div>
           <img id="profileAvatar" class="profile-avatar-preview" src="/favicon.svg" alt="Avatar">
-          <div class="form-field"><label for="avatarFile" data-i18n="profileAvatar">Аватар 512 × 512</label><input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" required><p class="small muted" data-i18n="profileAvatarHint">PNG, JPG или WebP. Ровно 512 × 512 пикселей, до 2 MB. На сервере хранится оптимизированная миниатюра 64 × 64.</p></div>
-          <div class="profile-actions"><button class="button green-button" type="submit" data-i18n="uploadAvatar">Загрузить аватар</button><button class="button secondary" type="button" id="cancelAvatarChanges" data-i18n="cancelChanges">Отменить</button></div><p id="avatarMessage" class="small muted" aria-live="polite"></p>
+          <div class="form-field"><label for="avatarFile" data-i18n="profileAvatar">Аватар 512 × 512</label><input
+              id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" required>
+            <p class="small muted" data-i18n="profileAvatarHint">PNG, JPG или WebP. Ровно 512 × 512 пикселей, до 2 MB.
+              На сервере хранится оптимизированная миниатюра 64 × 64.</p>
+          </div>
+          <div class="profile-actions"><button class="button green-button" type="submit"
+              data-i18n="uploadAvatar">Загрузить аватар</button><button class="button secondary" type="button"
+              id="cancelAvatarChanges" data-i18n="cancelChanges">Отменить</button></div>
+          <p id="avatarMessage" class="small muted" aria-live="polite"></p>
         </form>
         <form id="nicknameForm" class="profile-setting-card">
-          <div class="profile-setting-title"><span class="profile-setting-icon">Aa</span><div><h3 data-i18n="nicknameTitle">Никнейм</h3><p class="small muted" data-i18n="nicknameSub">Имя, которое видят другие игроки</p></div></div>
-          <div class="form-field"><label for="nicknameInput" data-i18n="nickname">Никнейм</label><input id="nicknameInput" maxlength="32" minlength="2" required autocomplete="nickname"></div>
-          <div class="profile-actions"><button class="button secondary" type="button" id="cancelProfileChanges" data-i18n="cancelChanges">Отменить изменения</button></div><p id="nicknameMessage" class="small muted" aria-live="polite"></p>
+          <div class="profile-setting-title">
+            <div>
+              <h3 data-i18n="nicknameTitle">Никнейм</h3>
+            </div>
+          </div>
+          <div class="form-field"><label for="nicknameInput" data-i18n="nickname">Никнейм</label><input
+              id="nicknameInput" maxlength="32" minlength="2" required autocomplete="nickname"></div>
+          <div class="profile-actions"><button class="button green-button" type="submit"
+              data-i18n="saveProfile">Сохранить никнейм</button><button class="button secondary" type="button" id="cancelProfileChanges"
+              data-i18n="cancelChanges">Отменить изменения</button></div>
+          <p id="nicknameMessage" class="small muted" aria-live="polite"></p>
         </form>
-        <form id="passwordForm" class="profile-setting-card">
-          <div class="profile-setting-title"><span class="profile-setting-icon">⌑</span><div><h3 data-i18n="passwordSettingsTitle">Пароль</h3><p class="small muted" data-i18n="passwordSettingsSub">Для входа по электронной почте</p></div></div>
-          <div class="form-field"><label for="currentPassword" data-i18n="currentPassword">Текущий пароль</label><input id="currentPassword" type="password" autocomplete="current-password" placeholder="Оставь пустым, если пароль ещё не настроен" data-i18n-placeholder="currentPasswordHint"></div>
-          <div class="form-field"><label for="newPassword" data-i18n="newPassword">Новый пароль</label><input id="newPassword" type="password" minlength="6" maxlength="128" autocomplete="new-password" required></div>
-          <p class="small muted" id="passwordHint">Минимум 6 символов.</p>
-          <div class="profile-actions"><button class="button green-button" type="submit" data-i18n="changePassword">Настроить пароль</button><button class="button secondary" type="button" id="cancelPasswordChanges" data-i18n="cancelChanges">Отменить</button></div><p id="passwordMessage" class="small muted" aria-live="polite"></p>
-        </form>
-      </div><div class="profile-save-row"><button class="button green-button" type="submit" form="nicknameForm" data-i18n="saveProfile">Сохранить профиль</button></div>
+      </div>
     </section>
-  <section class="danger-zone panel" aria-labelledby="deleteAccountTitle"><div class="danger-zone-copy"><h2 id="deleteAccountTitle" data-i18n="deleteAccountTitle">Удалить аккаунт</h2><p class="muted" data-i18n="deleteAccountWarning">Аккаунт и связанные профильные данные будут удалены без возможности восстановления.</p><p id="deleteAccountMessage" class="small muted" role="status"></p></div><button class="button danger" id="deleteAccountButton" type="button" data-i18n="deleteAccount">Удалить аккаунт навсегда</button></section>
+    <section class="panel profile-account-panel" aria-labelledby="accountSettingsTitle">
+      <div class="section-head"><h2 class="section-title" id="accountSettingsTitle" data-i18n="accountSettings">Аккаунт и безопасность</h2></div>
+      <div class="profile-settings-grid profile-security-grid">
+        <form id="passwordForm" class="profile-setting-card">
+          <div class="profile-setting-title"><h3 data-i18n="passwordSettingsTitle">Пароль</h3></div>
+          <div class="form-field"><label for="currentPassword" data-i18n="currentPassword">Текущий пароль</label><input
+              id="currentPassword" type="password" autocomplete="current-password"
+              placeholder="Оставь пустым, если пароль ещё не настроен" data-i18n-placeholder="currentPasswordHint"></div>
+          <div class="form-field"><label for="newPassword" data-i18n="newPassword">Новый пароль</label><input
+              id="newPassword" type="password" minlength="6" maxlength="128" autocomplete="new-password" required></div>
+          <p class="small muted" id="passwordHint">Минимум 6 символов.</p>
+          <div class="profile-actions"><button class="button green-button" type="submit"
+              data-i18n="changePassword">Изменить пароль</button><button class="button secondary" type="button"
+              id="cancelPasswordChanges" data-i18n="cancelChanges">Отменить</button></div>
+          <p id="passwordMessage" class="small muted" aria-live="polite"></p>
+        </form>
+        <section class="profile-setting-card profile-session-card">
+          <div class="profile-setting-title"><h3 data-i18n="sessionSettings">Сеанс</h3></div>
+          <p class="muted" data-i18n="sessionDescription">Завершить вход на этом устройстве.</p>
+          <button id="logoutButton" class="button secondary" type="button" data-i18n="signOut">Выйти</button>
+        </section>
+      </div>
+    </section>
+    <section class="danger-zone panel" aria-labelledby="deleteAccountTitle">
+      <div class="danger-zone-copy">
+        <h2 id="deleteAccountTitle" data-i18n="deleteAccountTitle">Удалить аккаунт</h2>
+        <p class="muted" data-i18n="deleteAccountWarning">Аккаунт и связанные профильные данные будут удалены без
+          возможности восстановления.</p>
+        <p id="deleteAccountMessage" class="small muted" role="status"></p>
+      </div><button class="button danger" id="deleteAccountButton" type="button" data-i18n="deleteAccount">Удалить
+        аккаунт навсегда</button>
+    </section>
   </main>
-  <footer class="foot"><div class="container foot-inner"><p class="foot-mark">SUPER CUBE</p><div class="foot-meta"><p class="foot-note">PLAYER PROFILE</p><a class="sdk-footer-link" href="/privacy-policy.html">Политика конфиденциальности</a><a class="sdk-footer-link" href="/documentation.html#sdk-reference" data-i18n="sdkFooterLink">SDK для разработчиков</a></div></div></footer>
-  <script src="/js/common.js" defer></script><script src="/js/profile.js" defer></script>
-</body></html>
+  <footer class="foot">
+    <div class="container foot-inner">
+      <p class="foot-mark">SUPER CUBE</p>
+      <div class="foot-meta">
+        <p class="foot-note">PLAYER PROFILE</p><a class="sdk-footer-link" href="/privacy-policy.html">Политика
+          конфиденциальности</a><a class="sdk-footer-link" href="/documentation.html#sdk-reference"
+          data-i18n="sdkFooterLink">SDK для разработчиков</a>
+      </div>
+    </div>
+  </footer>
+  <script src="/js/common.js" defer></script>
+  <script src="/js/profile.js" defer></script>
+</body>
+
+</html>

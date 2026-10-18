@@ -403,6 +403,21 @@ html,body{background:var(--bg);color:var(--text)}
 .favorite-cta:hover{background:#c82e5a!important;border-color:#c82e5a!important;transform:translateY(-2px) scale(1.015)}
 .favorite-cta.is-active{background:#a92b52!important;border-color:#a92b52!important}
 .danger-zone-copy{flex:1;min-width:0}
+
+/* Player profile layout */
+.profile-settings,.profile-account-panel{margin:18px 0;padding:22px}
+.profile-settings>.section-head,.profile-account-panel>.section-head{align-items:center;margin-bottom:16px;padding-bottom:14px}
+.profile-settings>.section-head .section-title,.profile-account-panel>.section-head .section-title{font-size:23px}
+.profile-settings>.profile-settings-grid,.profile-security-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.profile-setting-card h3{margin:0;font-size:17px;letter-spacing:-.025em}
+.profile-session-card{align-items:flex-start;justify-content:flex-start}
+.profile-session-card .button{margin-top:8px}
+.danger-zone{margin-top:20px}
+@media(max-width:620px){.profile-settings,.profile-account-panel{padding:16px}.profile-settings>.profile-settings-grid,.profile-security-grid{grid-template-columns:1fr}}
+
+/* Dashboard widget names stay on one line in every card size. */
+.dashboard-widget-heading>h2,.dashboard-widget-heading>h3,.dashboard-widget-header h2,.dashboard-widget-header h3,.dashboard-widget .section-head h2{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal!important;word-break:keep-all!important;min-width:0}
+.game-card .tag-list{margin-top:14px}
 .danger-zone>.button{margin-left:auto;flex:none;align-self:flex-end}
 .foot .foot-mark{color:var(--text)}
 .foot .foot-meta{display:grid;gap:8px;justify-items:end}
