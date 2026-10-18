@@ -368,7 +368,7 @@ app.get('/api/games/:slug/ping', async (req, res) => {
 // Public scoring leaderboard intentionally returns only public player ID, nickname and points.
 app.get('/api/leaderboard', async (req, res) => res.json({ players: await getPublicLeaderboard(db, req.query.limit) }));
 
-// Player account settings. Original avatar selection is 512×512 in the UI; compact 64×64 derivatives are stored.
+// Player account settings. Avatar images are center-cropped and compacted in the browser before storage.
 app.delete('/api/me/account', requireUser, async (req, res) => {
   const avatar = String(req.user.avatar_url || '').match(/^\/user-avatars\/(avatar-[a-f0-9]{36}\.(?:png|jpg|webp))$/i)?.[1];
   await db.prepare('DELETE FROM email_codes WHERE email=?').run(req.user.email);
@@ -389,7 +389,7 @@ app.post('/api/me/avatar', requireUser, avatarUpload.single('avatar'), async (re
   try { dims = imageSize(req.file.buffer); } catch { return res.status(400).json({ error: 'Avatar is not a valid image.' }); }
   const type = String(dims.type || '').toLowerCase();
   if (dims.width !== 64 || dims.height !== 64 || !['png','jpg','jpeg','webp'].includes(type))
-    return res.status(400).json({ error: 'Avatar must be a compact PNG, JPG or WebP image exactly 64 × 64 pixels. Select a 512 × 512 image in the profile page so it can be resized safely.' });
+    return res.status(400).json({ error: 'Avatar must be a compact PNG, JPG or WebP image exactly 64 × 64 pixels. Select an image in the profile page so it can be cropped and resized safely.' });
   const ext = type === 'jpeg' ? 'jpg' : type;
   const filename = `avatar-${crypto.randomBytes(18).toString('hex')}.${ext}`;
   const destination = path.join(avatarsDir, filename);
@@ -398,6 +398,12 @@ app.post('/api/me/avatar', requireUser, avatarUpload.single('avatar'), async (re
   await db.prepare('UPDATE users SET avatar_url=? WHERE id=?').run(`/user-avatars/${filename}`, req.user.id);
   if (previous) await fsp.rm(path.join(avatarsDir, previous), { force: true }).catch(() => {});
   res.json({ ok: true, avatar: `/user-avatars/${filename}` });
+});
+app.delete('/api/me/avatar', requireUser, async (req, res) => {
+  const previous = String(req.user.avatar_url || '').match(/^\/user-avatars\/(avatar-[a-f0-9]{36}\.(?:png|jpg|webp))$/i)?.[1];
+  await db.prepare('UPDATE users SET avatar_url=? WHERE id=?').run('', req.user.id);
+  if (previous) await fsp.rm(path.join(avatarsDir, previous), { force: true }).catch(() => {});
+  res.json({ ok: true, avatar: '' });
 });
 app.get('/user-avatars/:filename', async (req, res) => {
   const filename = String(req.params.filename || '');

@@ -35,23 +35,21 @@
         <p class="section-note" id="publicPlayerId">SC-…</p>
       </div>
       <div class="profile-settings-grid">
-        <form id="avatarForm" class="profile-setting-card">
+        <section class="profile-setting-card">
           <div class="profile-setting-title">
             <div>
               <h3 data-i18n="profileAvatarTitle">Аватар</h3>
             </div>
           </div>
           <img id="profileAvatar" class="profile-avatar-preview" src="/favicon.svg" alt="Avatar">
-          <div class="form-field"><label for="avatarFile" data-i18n="profileAvatar">Аватар 512 × 512</label><input
-              id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" required>
-            <p class="small muted" data-i18n="profileAvatarHint">PNG, JPG или WebP. Ровно 512 × 512 пикселей, до 2 MB.
-              На сервере хранится оптимизированная миниатюра 64 × 64.</p>
+          <div class="form-field"><label for="avatarFile" data-i18n="profileAvatar">Изображение аватара</label><input
+              id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp">
+            <p class="small muted" data-i18n="profileAvatarHint">PNG, JPG или WebP любого размера. Квадратная область
+              вырезается по центру, затем изображение уменьшается до 64 × 64.</p>
           </div>
-          <div class="profile-actions"><button class="button green-button" type="submit"
-              data-i18n="uploadAvatar">Загрузить аватар</button><button class="button secondary" type="button"
-              id="cancelAvatarChanges" data-i18n="cancelChanges">Отменить</button></div>
+          <button class="button secondary" type="button" id="deleteAvatarButton" data-i18n="deleteAvatar" hidden>Удалить аватар</button>
           <p id="avatarMessage" class="small muted" aria-live="polite"></p>
-        </form>
+        </section>
         <form id="nicknameForm" class="profile-setting-card">
           <div class="profile-setting-title">
             <div>

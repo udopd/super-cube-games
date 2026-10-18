@@ -18,9 +18,9 @@
     const d = {
       games: ['Игры', 'Games'], platform: ['Состояние платформы', 'Platform status'],
       overview: ['Общие показатели', 'Overview'], gameplay: ['Игровая активность', 'Gameplay activity'], health: ['Состояние платформы', 'Platform health'], errors: ['Ошибки платформы и игр', 'Platform and game errors'], weeklyPlayers: ['Игроки за последние 7 дней', 'Players over the last 7 days'], medianRating: ['Медиана / оценка по игре', 'Median / rating by game'], playersToday: ['Число игроков сегодня · сравнение игр', 'Players today · compare games'],
-      restore: ['Восстановить', 'Restore'], collapse: ['Свернуть блок', 'Collapse widget'], expand: ['Развернуть блок', 'Expand widget'], hide: ['Скрыть блок', 'Hide widget'],
+      restore: ['Восстановить', 'Restore'], hide: ['Скрыть блок', 'Hide widget'],
       resize: ['Изменить ширину блока', 'Change widget width'], halfWidth: ['Вернуть обычную ширину', 'Return to half width'], fullscreen: ['Открыть подробный вид', 'Open detailed view'], closeFullscreen: ['Закрыть подробный вид', 'Close detailed view'], fullscreenTitle: ['Подробный вид блока', 'Widget detail view'],
-      layout: ['Перетаскивай блоки за заголовок, сворачивай или скрывай их. Расположение сохранится в этом браузере.', 'Drag widgets by their headings, collapse or hide them. The layout is saved in this browser.'],
+      layout: ['Перетаскивай блоки за заголовок или скрывай их. Расположение сохранится в этом браузере.', 'Drag widgets by their headings or hide them. The layout is saved in this browser.'],
       noErrors: ['Ошибок по доступным источникам не обнаружено.', 'No errors were reported by available sources.'],
       runtimeError: ['Ошибка серверной игры', 'Server game error'], platform: ['Платформа', 'Platform'], event: ['Событие', 'Event'], recent: ['Недавние события', 'Recent events']
     };
@@ -78,7 +78,7 @@
     const gameplayBody=document.createElement('div'); gameplayBody.className='dashboard-widget-body'; const gameplayStats=$('globalStatsSecondary'); if(gameplayStats) gameplayBody.appendChild(gameplayStats); gameplay.appendChild(gameplayBody); gamesGrid.appendChild(gameplay);
     ['platformCcuChart', 'dailyPlayersChart', 'dailyPlayers7dChart'].forEach((id, i) => {
       const panel = $(id)?.closest('.metric-panel');
-      if (panel) wrapAsWidget(panel, '', ['platform-ccu-history','platform-daily-players','platform-weekly-players'][i], platformGrid, false);
+      if (panel) wrapAsWidget(panel, '', ['platform-ccu-history','platform-daily-players','platform-weekly-players'][i], platformGrid, true);
     });
     const monitoring = $('monitoringSection');
     if (monitoring) {
@@ -105,7 +105,12 @@
     enhanceDashboardWidgets();
     document.querySelectorAll('.dashboard-widget-grid').forEach((grid) => [...grid.children].forEach((widget, index) => { widget.dataset.dashboardInitialIndex = String(index); }));
     const stored = (() => { try { return JSON.parse(localStorage.getItem(dashboardLayoutKey) || '{}'); } catch { return {}; } })();
-    dashboardLayout = { active: stored.active === 'platform' ? 'platform' : 'games', order: stored.order || {}, hidden: stored.hidden || {}, collapsed: stored.collapsed || [] };
+    const widths = stored.widths || {};
+    if (stored.widthVersion !== 1) {
+      ['platform-ccu-history', 'platform-daily-players', 'platform-weekly-players'].forEach((id) => { widths[id] = true; });
+      stored.widthVersion = 1;
+    }
+    dashboardLayout = { active: stored.active === 'platform' ? 'platform' : 'games', order: stored.order || {}, hidden: stored.hidden || {}, widths, widthVersion: stored.widthVersion };
     applyDashboardLayout();
     installWidgetFullscreen();
     $('dashboardGamesTab')?.addEventListener('click', () => { activateAnalyticsPage('metrics'); activateDashboardTab('games'); });
@@ -113,8 +118,8 @@
     window.addEventListener('sc:language', () => {
       document.querySelectorAll('[data-dashboard-title]').forEach((el) => { const key = el.dataset.dashboardTitle; el.textContent = dashboardText(key); });
       const note = $('dashboardLayoutNote'); if (note) note.textContent = dashboardText('layout');
-      document.querySelectorAll('[data-widget-collapse]').forEach((button) => { const collapsed = button.closest('.dashboard-widget')?.classList.contains('is-collapsed'); button.title = dashboardText(collapsed ? 'expand' : 'collapse'); button.setAttribute('aria-label', button.title); });
       document.querySelectorAll('[data-widget-hide]').forEach((button) => { button.title = dashboardText('hide'); button.setAttribute('aria-label', button.title); });
+      document.querySelectorAll('[data-widget-width-toggle]').forEach((button) => updateWidgetWidthControl(button.closest('.dashboard-widget')));
       document.querySelectorAll('.dashboard-widget-controls button').forEach((button) => { if(button.textContent==='↑'){button.title=t('Переместить выше','Move up');button.setAttribute('aria-label',button.title)} if(button.textContent==='↓'){button.title=t('Переместить ниже','Move down');button.setAttribute('aria-label',button.title)} });
       document.querySelectorAll('[data-widget-fullscreen]').forEach((button) => { button.title = dashboardText('fullscreen'); button.setAttribute('aria-label',button.title); });
       document.querySelectorAll('.dashboard-widget-drag-handle').forEach((button) => { button.title = t('Переместить блок','Move widget'); button.setAttribute('aria-label',button.title); });
@@ -155,11 +160,17 @@
       header.replaceChildren(handle, heading, controls);
       const fullscreen = document.createElement('button'); fullscreen.type = 'button'; fullscreen.className = 'dashboard-widget-control'; fullscreen.dataset.widgetFullscreen = ''; fullscreen.textContent = '⛶';
       fullscreen.title = dashboardText('fullscreen'); fullscreen.setAttribute('aria-label', fullscreen.title);
-      const collapse = document.createElement('button'); collapse.type = 'button'; collapse.className = 'dashboard-widget-control'; collapse.dataset.widgetCollapse = ''; collapse.textContent = '−'; collapse.title = dashboardText('collapse'); collapse.setAttribute('aria-label', dashboardText('collapse'));
+      const widthToggle = document.createElement('button'); widthToggle.type = 'button'; widthToggle.className = 'dashboard-widget-control'; widthToggle.dataset.widgetWidthToggle = ''; widthToggle.textContent = '↔';
+      widthToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        widget.classList.toggle('widget-wide');
+        updateWidgetWidthControl(widget);
+        saveDashboardLayout();
+      });
       const hide = document.createElement('button'); hide.type = 'button'; hide.className = 'dashboard-widget-control'; hide.dataset.widgetHide = ''; hide.textContent = '×'; hide.title = dashboardText('hide'); hide.setAttribute('aria-label', dashboardText('hide'));
-      controls.append(fullscreen, collapse, hide);
+      controls.append(fullscreen, widthToggle, hide);
       fullscreen.addEventListener('click', (event) => { event.stopPropagation(); openWidgetFullscreen(widget, fullscreen); });
-      collapse.addEventListener('click', (event) => { event.stopPropagation(); widget.classList.toggle('is-collapsed'); const state = widget.classList.contains('is-collapsed'); collapse.textContent = state ? '+' : '−'; collapse.title = dashboardText(state ? 'expand' : 'collapse'); collapse.setAttribute('aria-label', collapse.title); saveDashboardLayout(); });
+      updateWidgetWidthControl(widget);
       hide.addEventListener('click', (event) => { event.stopPropagation(); widget.hidden = true; saveDashboardLayout(); renderDashboardRestoreList(); });
       // Pointer-based sorting works with mouse, pen and touch; native HTML drag-and-drop is desktop-only.
       handle.addEventListener('pointerdown', (event) => {
@@ -287,9 +298,19 @@
   }
 
   function activateDashboardTab(tab) {
-    if (!dashboardLayout) dashboardLayout = { active: 'games', order: {}, hidden: {}, collapsed: [] };
+    if (!dashboardLayout) dashboardLayout = { active: 'games', order: {}, hidden: {} };
     dashboardLayout.active = tab === 'platform' ? 'platform' : 'games';
     applyDashboardLayout(); saveDashboardLayout();
+  }
+  function updateWidgetWidthControl(widget) {
+    if (!widget) return;
+    const button = widget.querySelector('[data-widget-width-toggle]');
+    if (!button) return;
+    const wide = widget.classList.contains('widget-wide');
+    button.textContent = wide ? '><' : '↔';
+    button.title = dashboardText(wide ? 'halfWidth' : 'resize');
+    button.setAttribute('aria-label', button.title);
+    button.setAttribute('aria-pressed', String(wide));
   }
   function applyDashboardLayout() {
     const active = dashboardLayout.active || 'games';
@@ -300,9 +321,10 @@
       [...grid.children].forEach((widget) => {
         const hidden = (dashboardLayout.hidden?.[tab] || []).includes(widget.dataset.widgetId);
         widget.hidden = hidden;
-        widget.classList.toggle('is-collapsed', (dashboardLayout.collapsed || []).includes(widget.dataset.widgetId));
-        const collapse = widget.querySelector('[data-widget-collapse]');
-        if (collapse) { const collapsed = widget.classList.contains('is-collapsed'); collapse.textContent = collapsed ? '+' : '−'; collapse.title = dashboardText(collapsed ? 'expand' : 'collapse'); collapse.setAttribute('aria-label', collapse.title); }
+        if (Object.prototype.hasOwnProperty.call(dashboardLayout.widths || {}, widget.dataset.widgetId)) {
+          widget.classList.toggle('widget-wide', Boolean(dashboardLayout.widths[widget.dataset.widgetId]));
+        }
+        updateWidgetWidthControl(widget);
       });
       grid.hidden = tab !== active;
       const tabButton = $(`dashboard${tab === 'games' ? 'Games' : 'Platform'}Tab`);
@@ -316,8 +338,9 @@
       const grid = $(`dashboard${tab === 'games' ? 'Games' : 'Platform'}Panel`); if (!grid) return;
       dashboardLayout.order[tab] = [...grid.children].map((widget) => widget.dataset.widgetId).filter(Boolean);
       dashboardLayout.hidden[tab] = [...grid.children].filter((widget) => widget.hidden).map((widget) => widget.dataset.widgetId);
+      dashboardLayout.widths = { ...(dashboardLayout.widths || {}) };
+      [...grid.children].forEach((widget) => { dashboardLayout.widths[widget.dataset.widgetId] = widget.classList.contains('widget-wide'); });
     });
-    dashboardLayout.collapsed = [...document.querySelectorAll('.dashboard-widget.is-collapsed')].map((widget) => widget.dataset.widgetId);
     try { localStorage.setItem(dashboardLayoutKey, JSON.stringify(dashboardLayout)); } catch {}
     renderDashboardRestoreList();
   }
