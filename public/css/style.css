@@ -2341,6 +2341,14 @@ html.theme-transitioning * {
   margin: 14px 0 8px
 }
 
+.sdk-prompt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap
+}
+
 .sdk-copy-button {
   background: var(--green);
   border-color: var(--green);

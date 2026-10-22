@@ -84,8 +84,20 @@ server.listen(port, '0.0.0.0', () => {
         ["track(name, metadata)", 'События прогресса', 'Поддерживаются custom_click, level_start и level_complete. Метаданные должны быть компактными и безопасными.']
       ],
       exampleTitle: 'Пример интеграции', browserExampleTitle: 'Сохранение браузерной игры', serverExampleTitle: 'Минимальная точка входа серверной игры', showMethodExample:'Показать пример кода', hideMethodExample:'Скрыть пример кода', clickerTitle:'Полный пример: простой кликер', clickerLead:'Самодостаточная браузерная игра: счёт, загрузка/сохранение прогресса и безопасная обработка отсутствия авторизации.',
-      promptsTitle: 'Промпты для нейросети', promptsLead: 'Выбери задачу. Промпт можно скопировать целиком и передать ИИ вместе с исходным ZIP для адаптации существующей игры.',
-      createPrompt: 'Создать новую игру', convertPrompt: 'Адаптировать существующий ZIP', copyPrompt: 'Скопировать промпт', copied: 'Промпт скопирован', copyError: 'Не удалось скопировать автоматически. Выдели текст и скопируй вручную.',
+      promptsTitle: 'Промпты для нейросети', promptsLead: 'Выбери задачу. Промпт можно скопировать или скачать в Markdown; ZIP передавай ИИ при адаптации существующей игры.', promptTitle: 'SUPER CUBE Games',
+      createPrompt: 'Создать новую игру', convertPrompt: 'Адаптировать существующий ZIP', copyPrompt: 'Скопировать промпт', downloadPrompt: 'Скачать .md', copied: 'Промпт скопирован', downloaded: 'Markdown-файл промпта скачан', copyError: 'Не удалось скопировать автоматически. Выдели текст и скопируй вручную.',
+      promptQuality: `## Дополнительные требования к качеству
+- Не ограничивайся планом или фрагментами кода: подготовь полный проект с рабочими файлами и ресурсами.
+- Сделай законченный игровой цикл: понятное начало, обратная связь на действия, победа/поражение или завершение раунда, повторный запуск.
+- Проверь интерфейс на узком экране и внутри iframe; обеспечь управление мышью и touch, а клавиатурное — где оно подходит игре.
+- Обеспечь читаемый контраст, заметный фокус клавиатуры, масштабирование без горизонтальной прокрутки и уважение к prefers-reduced-motion.
+- Не оставляй внешних зависимостей, секретов, тестовых данных, фиктивных элементов и ссылок на localhost без явной необходимости.
+- Перед сдачей проверь структуру файлов, относительные пути, запуск и ошибки в консоли доступными средствами. В финале перечисли содержимое архива, реально выполненные проверки и известные ограничения; не заявляй о проверках, которые не запускались.`,
+      promptServerQuality: `## Дополнительно для серверного runtime
+- Клиент отправляет только намерения игрока; сервер проверяет каждое действие и возвращает безопасный снимок состояния.
+- Явно определи формат сообщений, ошибки и версии протокола. Отклоняй некорректные, слишком большие и повторные запросы безопасным способом.
+- Не раскрывай приватные данные, токены приглашений, скрытую информацию соперника или секреты в ответах и логах.
+- Подготовь инструкции локального запуска и сценарии проверки для двух игроков, неверного хода, переподключения и завершения комнаты.`,
       newPromptBrowser: `Ты — senior HTML5 game developer. Создай завершённую адаптивную игру для SUPER CUBE Games Platform.
 
 СНАЧАЛА
@@ -186,8 +198,20 @@ UX И РЕЗУЛЬТАТ
         ['track(name, metadata)', 'Progress events', 'Supported names are custom_click, level_start and level_complete. Metadata must be small and safe.']
       ],
       exampleTitle: 'Integration example', browserExampleTitle: 'Saving a browser game', serverExampleTitle: 'Minimal server-game entry point', showMethodExample:'Show code example', hideMethodExample:'Hide code example', clickerTitle:'Complete example: a simple clicker', clickerLead:'A self-contained browser game: score, load/save progress and graceful handling for guests.',
-      promptsTitle: 'AI prompts', promptsLead: 'Choose a task. Copy the full prompt and provide it to your AI tool along with the source ZIP when adapting an existing game.',
-      createPrompt: 'Create a new game', convertPrompt: 'Convert an existing ZIP', copyPrompt: 'Copy prompt', copied: 'Prompt copied', copyError: 'Automatic copy failed. Select the text and copy it manually.',
+      promptsTitle: 'AI prompts', promptsLead: 'Choose a task. Copy the full prompt or download it as Markdown; provide the source ZIP when adapting an existing game.', promptTitle: 'SUPER CUBE Games',
+      createPrompt: 'Create a new game', convertPrompt: 'Convert an existing ZIP', copyPrompt: 'Copy prompt', downloadPrompt: 'Download .md', copied: 'Prompt copied', downloaded: 'Prompt Markdown file downloaded', copyError: 'Automatic copy failed. Select the text and copy it manually.',
+      promptQuality: `## Additional quality requirements
+- Do not stop at a plan or code fragments: prepare a complete project with working files and assets.
+- Deliver a complete game loop: clear start, feedback for actions, win/loss or round completion, and a way to play again.
+- Check the interface on a narrow screen and inside an iframe; support mouse and touch, plus keyboard controls where appropriate.
+- Provide readable contrast, visible keyboard focus, layouts without horizontal overflow, and respect prefers-reduced-motion.
+- Avoid unnecessary external dependencies, secrets, test data, fake controls, and localhost links.
+- Before delivery, inspect the file structure, relative paths, startup and console errors with available tools. In the final response list the archive contents, checks actually performed, and known limitations; never claim checks that were not run.`,
+      promptServerQuality: `## Additional server-runtime requirements
+- The client sends player intents only; the server validates every action and returns a safe state snapshot.
+- Define message formats, errors, and protocol versioning. Reject malformed, oversized, or repeated requests safely.
+- Never expose private data, invite tokens, opponents’ hidden information, or secrets in responses or logs.
+- Provide local startup instructions and verification scenarios for two players, invalid moves, reconnects, and room cleanup.`,
       newPromptBrowser: `You are a senior HTML5 game developer. Build a complete responsive game for SUPER CUBE Games Platform.
 
 FIRST
@@ -269,8 +293,12 @@ DELIVERY
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const getPrompt = () => {
     const d = text[lang];
-    if (promptMode === 'create') return mode === 'browser' ? d.newPromptBrowser : d.newPromptServer;
-    return mode === 'browser' ? d.convertPromptBrowser : d.convertPromptServer;
+    const body = promptMode === 'create'
+      ? (mode === 'browser' ? d.newPromptBrowser : d.newPromptServer)
+      : (mode === 'browser' ? d.convertPromptBrowser : d.convertPromptServer);
+    const title = `${d.promptTitle} · ${promptMode === 'create' ? d.createPrompt : d.convertPrompt} · ${mode === 'browser' ? d.browser : d.server}`;
+    const markdownBody = body.trim().replace(/^([А-ЯЁ][А-ЯЁ /&-]{2,}|[A-Z][A-Z /&-]{2,})$/gm, '## $1');
+    return `# ${title}\n\n${markdownBody}\n\n${d.promptQuality}${mode === 'server' ? `\n\n${d.promptServerQuality}` : ''}\n`;
   };
 
   function methodCode(method, mode) {
@@ -319,7 +347,7 @@ document.querySelector('#click').addEventListener('click',async()=>{count++;rend
       <section class="sdk-code-example sdk-full-clicker"><h3>${esc(d.clickerTitle)}</h3><p>${esc(d.clickerLead)}</p><details><summary>${esc(d.showMethodExample)}</summary><pre><code>${esc(fullClickerExample())}</code></pre></details></section>
       <section class="sdk-prompts"><h3>${esc(d.promptsTitle)}</h3><p>${esc(d.promptsLead)}</p>
         <div class="sdk-mode-tabs prompt-tabs" role="group"><button type="button" class="button ${promptMode==='create'?'':'secondary'}" data-prompt="create">${esc(d.createPrompt)}</button><button type="button" class="button ${promptMode==='convert'?'':'secondary'}" data-prompt="convert">${esc(d.convertPrompt)}</button></div>
-        <div class="sdk-prompt-header"><strong>${esc(promptMode==='create'?d.createPrompt:d.convertPrompt)} · ${esc(mode==='browser'?d.browser:d.server)}</strong><button class="button sdk-copy-button" type="button" id="copySdkPrompt">${esc(d.copyPrompt)}</button></div>
+        <div class="sdk-prompt-header"><strong>${esc(promptMode==='create'?d.createPrompt:d.convertPrompt)} · ${esc(mode==='browser'?d.browser:d.server)}</strong><div class="sdk-prompt-actions"><button class="button secondary" type="button" id="downloadSdkPrompt">${esc(d.downloadPrompt)}</button><button class="button sdk-copy-button" type="button" id="copySdkPrompt">${esc(d.copyPrompt)}</button></div></div>
         <pre class="sdk-prompt-text" id="sdkPromptText"><code>${esc(getPrompt())}</code></pre><p class="small muted" id="sdkCopyStatus" role="status"></p>
       </section>`;
     const sections = [...root.querySelectorAll(':scope > section, :scope > .sdk-two-column')];
@@ -330,6 +358,7 @@ document.querySelector('#click').addEventListener('click',async()=>{count++;rend
     root.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;render()}));
     root.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{promptMode=b.dataset.prompt;render()}));
     root.querySelector('#copySdkPrompt').addEventListener('click',copyPrompt);
+    root.querySelector('#downloadSdkPrompt').addEventListener('click',downloadPrompt);
   }
   async function copyPrompt() {
     const button = root.querySelector('#copySdkPrompt');
@@ -340,6 +369,24 @@ document.querySelector('#click').addEventListener('click',async()=>{count++;rend
       status.textContent=text[lang].copied;
     } catch { status.textContent=text[lang].copyError; }
     button.blur();
+  }
+  function downloadPrompt() {
+    const d = text[lang];
+    const kind = promptMode === 'create' ? 'create' : 'adapt';
+    const locale = lang === 'ru' ? 'ru' : 'en';
+    const fileName = `super-cube-${kind}-${mode}-${locale}.md`;
+    const file = new Blob(['\uFEFF', getPrompt()], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.hidden = true;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const status = root.querySelector('#sdkCopyStatus');
+    if (status) status.textContent = d.downloaded;
   }
   function updatePageLanguage(nextLang) {
     lang = nextLang === 'en' ? 'en' : 'ru';
