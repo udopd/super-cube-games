@@ -841,6 +841,12 @@ app.get('/admin/recommendations', requireAdminPage, async (req, res) => res.send
 app.get(['/login.html', '/reset-password.html', '/documentation.html', '/sdk.html', '/privacy-policy.html', '/leaderboard.html', '/404.html'], async (req, res) => {
   res.sendFile(path.join(__dirname, path.basename(req.path)));
 });
+// The game SDK is loaded inside sandboxed game iframes with an opaque origin.
+// Override the site's default same-site CORP policy so the injected script can load.
+app.get('/js/game-sdk.js', (_req, res) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.sendFile(path.join(publicDir, 'js', 'game-sdk.js'));
+});
 app.use(express.static(publicDir, { index: false, maxAge: env.NODE_ENV === 'production' ? '1h' : 0, fallthrough: true }));
 app.get(['/', '/games', '/index.html'], async (req, res) => {
   try {
