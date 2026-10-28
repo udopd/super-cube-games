@@ -159,6 +159,35 @@ async function findValidCapsule(root) {
   throw new GameArchiveError('The media/ folder must contain a valid JPG/JPEG or GIF capsule exactly 630 × 500 pixels.');
 }
 
+async function findValidFavicon(root) {
+  const candidates = ['favicon.ico', 'media/favicon.ico', 'favicon.png', 'media/favicon.png', 'favicon.svg', 'media/favicon.svg'];
+  const found = await firstExisting(root, candidates);
+  if (!found) return null;
+  const buffer = await fsp.readFile(found.fullPath);
+  if (buffer.length > 1024 * 1024) throw new GameArchiveError('The game favicon must be 1 MB or smaller.');
+  const extension = path.extname(found.name).toLowerCase();
+
+  if (extension === '.ico') {
+    if (buffer.length < 22 || buffer.readUInt16LE(0) !== 0 || buffer.readUInt16LE(2) !== 1) {
+      throw new GameArchiveError('The game favicon.ico is not a valid Windows icon file.');
+    }
+    const images = buffer.readUInt16LE(4);
+    if (images < 1 || buffer.length < 6 + images * 16) throw new GameArchiveError('The game favicon.ico contains an incomplete image directory.');
+  } else if (extension === '.png') {
+    let dimensions;
+    try { dimensions = imageSize(buffer); } catch { throw new GameArchiveError('The game favicon.png is not a valid PNG image.'); }
+    if (String(dimensions.type).toLowerCase() !== 'png' || !dimensions.width || !dimensions.height || dimensions.width > 512 || dimensions.height > 512) {
+      throw new GameArchiveError('The game favicon.png must be a valid image no larger than 512 × 512 pixels.');
+    }
+  } else {
+    const svg = buffer.toString('utf8');
+    if (!/<svg\b/i.test(svg) || !/<\/svg\s*>/i.test(svg) || /<!DOCTYPE|<script\b|<foreignObject\b|\bon[a-z]+\s*=|(?:href|src)\s*=\s*["']\s*(?:https?:|\/\/|javascript:|data:)/i.test(svg)) {
+      throw new GameArchiveError('The game favicon.svg is invalid or contains unsupported active content.');
+    }
+  }
+  return found.name.split('/').join('/');
+}
+
 async function readTextFile(root, name, maxLength) {
   const file = path.join(root, name);
   let value;
@@ -256,6 +285,7 @@ export async function createDraftFromZip({ db, zipBuffer, storageDir }) {
       if (!serverStat?.isFile() || serverStat.size > 2 * 1024 * 1024) throw new GameArchiveError('Server games must include server/index.js (up to 2 MB).');
     }
     const capsule = await findValidCapsule(root);
+    const faviconPath = await findValidFavicon(root);
     const indexPath = path.join(root, 'index.html');
     const stat = await fsp.stat(indexPath);
     if (!stat.isFile() || stat.size > 2 * 1024 * 1024) throw new GameArchiveError('index.html must be a file smaller than 2 MB.');
@@ -265,10 +295,10 @@ export async function createDraftFromZip({ db, zipBuffer, storageDir }) {
     await fsp.cp(root, finalDir, { recursive: true, errorOnExist: true, force: false });
     const timestamp = now();
     const result = await db.prepare(`INSERT INTO games(slug,title,description,tags_json,capsule_path,entry_path,min_players,max_players,status,created_at,updated_at,
-      description_ru,description_en,tags_ru_json,tags_en_json,runtime_type,archive_bytes)
-      VALUES(?,?,?,?,?,'index.html',1,1,'draft',?,?,?,?,?,?,?,?)`)
+      description_ru,description_en,tags_ru_json,tags_en_json,runtime_type,archive_bytes,favicon_path)
+      VALUES(?,?,?,?,?,'index.html',1,1,'draft',?,?,?,?,?,?,?,?,?)`)
       .run(slug, title, description, JSON.stringify(tags), capsule.relativePath, timestamp, timestamp,
-        descriptionRu, descriptionEn, JSON.stringify(tagsRu), JSON.stringify(tagsEn), runtimeType, zipBuffer.length);
+        descriptionRu, descriptionEn, JSON.stringify(tagsRu), JSON.stringify(tagsEn), runtimeType, zipBuffer.length, faviconPath);
     return await db.prepare('SELECT * FROM games WHERE id=?').get(Number(result.lastInsertRowid));
   } catch (error) {
     if (finalDir) await fsp.rm(finalDir, { recursive: true, force: true }).catch(() => {});

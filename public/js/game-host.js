@@ -23,12 +23,13 @@
   let heartbeatTimer = null;
   let guestId = '';
   let favoriteState = null;
+  let ratingState = null;
   let favoriteStateRevision = 0;
   let stopping = false;
   const requestIdPattern = /^sc-[a-z0-9-]{8,100}$/i;
 
   function sendGameSettings() {
-    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ channel: 'SC_PLATFORM_SETTINGS', language: window.SC?.language || 'en', theme: window.SC?.theme || 'light', favorite: favoriteState }, '*');
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ channel: 'SC_PLATFORM_SETTINGS', language: window.SC?.language || 'en', theme: window.SC?.theme || 'light', favorite: favoriteState, rating: ratingState }, '*');
   }
   async function loadGameFavoriteState() {
     if (testBuild) return;
@@ -38,6 +39,7 @@
       const result = await api(`/api/games/${encodeURIComponent(slug)}/details?lang=${encodeURIComponent(window.SC?.language || 'ru')}`);
       if (revision !== favoriteStateRevision) return;
       favoriteState = Boolean(result.isFavorite);
+      ratingState = Number.isInteger(Number(result.ownRating)) ? Number(result.ownRating) : 0;
       sendGameSettings();
     } catch {
       // Keep the game's default state when favorite status cannot be loaded.
@@ -74,7 +76,12 @@
       }
       case 'save': return api(`/api/games/${encodeURIComponent(slug)}/save`, 'POST', { data: payload.data });
       case 'loadSave': { const boot = await window.SC.refreshBootstrap(); if (!boot.user) return { save: null, requiresSignIn: true, updatedAt: null }; return api(`/api/games/${encodeURIComponent(slug)}/save`); }
-      case 'rate': return api(`/api/games/${encodeURIComponent(slug)}/rating`, 'POST', { rating: Number(payload.rating) });
+      case 'rate': {
+        const result = await api(`/api/games/${encodeURIComponent(slug)}/rating`, 'POST', { rating: Number(payload.rating) });
+        ratingState = Number(payload.rating);
+        sendGameSettings();
+        return result;
+      }
       case 'review': return api(`/api/games/${encodeURIComponent(slug)}/review`, 'POST', { body: String(payload.body || '').slice(0, 2000) });
       case 'favorite': {
         const result = await api(`/api/games/${encodeURIComponent(slug)}/favorite`, 'POST', {});
