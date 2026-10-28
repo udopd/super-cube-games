@@ -22,16 +22,31 @@
   let activeSession = null;
   let heartbeatTimer = null;
   let guestId = '';
+  let favoriteState = null;
+  let favoriteStateRevision = 0;
   let stopping = false;
   const requestIdPattern = /^sc-[a-z0-9-]{8,100}$/i;
 
   function sendGameSettings() {
-    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ channel: 'SC_PLATFORM_SETTINGS', language: window.SC?.language || 'en', theme: window.SC?.theme || 'light' }, '*');
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ channel: 'SC_PLATFORM_SETTINGS', language: window.SC?.language || 'en', theme: window.SC?.theme || 'light', favorite: favoriteState }, '*');
+  }
+  async function loadGameFavoriteState() {
+    if (testBuild) return;
+    const revision = favoriteStateRevision;
+    try {
+      await window.SC?.ready;
+      const result = await api(`/api/games/${encodeURIComponent(slug)}/details?lang=${encodeURIComponent(window.SC?.language || 'ru')}`);
+      if (revision !== favoriteStateRevision) return;
+      favoriteState = Boolean(result.isFavorite);
+      sendGameSettings();
+    } catch {
+      // Keep the game's default state when favorite status cannot be loaded.
+    }
   }
   iframe?.addEventListener('load', sendGameSettings);
   window.addEventListener('sc:language', sendGameSettings);
   window.addEventListener('sc:theme', sendGameSettings);
-  window.SC?.ready?.then(sendGameSettings);
+  window.SC?.ready?.then(() => { sendGameSettings(); void loadGameFavoriteState(); });
   function htmlEscape(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
   async function api(url, method = 'GET', body) {
     const options = { method, headers: { accept: 'application/json' }, credentials: 'same-origin' };
@@ -61,7 +76,15 @@
       case 'loadSave': { const boot = await window.SC.refreshBootstrap(); if (!boot.user) return { save: null, requiresSignIn: true, updatedAt: null }; return api(`/api/games/${encodeURIComponent(slug)}/save`); }
       case 'rate': return api(`/api/games/${encodeURIComponent(slug)}/rating`, 'POST', { rating: Number(payload.rating) });
       case 'review': return api(`/api/games/${encodeURIComponent(slug)}/review`, 'POST', { body: String(payload.body || '').slice(0, 2000) });
-      case 'favorite': return api(`/api/games/${encodeURIComponent(slug)}/favorite`, 'POST', {});
+      case 'favorite': {
+        const result = await api(`/api/games/${encodeURIComponent(slug)}/favorite`, 'POST', {});
+        if (typeof result.favorite === 'boolean') {
+          favoriteStateRevision++;
+          favoriteState = result.favorite;
+          sendGameSettings();
+        }
+        return result;
+      }
       case 'share': return api(`/api/games/${encodeURIComponent(slug)}/share`, 'POST', { guestId });
       case 'recordClick': return api('/api/sdk/event', 'POST', { slug, guestId, type: 'game_click', label: String(payload.label || '').slice(0, 80) });
       case 'track': {
