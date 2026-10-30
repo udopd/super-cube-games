@@ -19,8 +19,9 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "${POSTGRES_CPU_LIMIT:-1.50}"
-          memory: "${POSTGRES_MEMORY_LIMIT:-1g}"
+          cpus: "${POSTGRES_CPU_LIMIT:-1.00}"
+          memory: "${POSTGRES_MEMORY_LIMIT:-256m}"
+    cpu_shares: 1024
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 30s
@@ -58,8 +59,9 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "${DATA_API_CPU_LIMIT:-0.75}"
-          memory: "${DATA_API_MEMORY_LIMIT:-512m}"
+          cpus: "${DATA_API_CPU_LIMIT:-1.00}"
+          memory: "${DATA_API_MEMORY_LIMIT:-192m}"
+    cpu_shares: 768
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=4", "-O", "/dev/null", "http://127.0.0.1:4001/health"]
       interval: 30s
@@ -102,7 +104,8 @@ services:
       resources:
         limits:
           cpus: "${GAME_RUNTIME_CPU_LIMIT:-1.00}"
-          memory: "${GAME_RUNTIME_MEMORY_LIMIT:-512m}"
+          memory: "${GAME_RUNTIME_MEMORY_LIMIT:-128m}"
+    cpu_shares: 512
     healthcheck:
       test: ["CMD-SHELL", "docker info >/dev/null 2>&1"]
       interval: 30s
@@ -157,8 +160,9 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "${PLATFORM_CPU_LIMIT:-1.50}"
-          memory: "${PLATFORM_MEMORY_LIMIT:-1g}"
+          cpus: "${PLATFORM_CPU_LIMIT:-1.00}"
+          memory: "${PLATFORM_MEMORY_LIMIT:-192m}"
+    cpu_shares: 2048
 
 volumes:
   postgres-data:
