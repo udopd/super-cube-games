@@ -10,12 +10,23 @@ services:
       - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: non-blocking
+    deploy:
+      resources:
+        limits:
+          cpus: "${POSTGRES_CPU_LIMIT:-1.50}"
+          memory: "${POSTGRES_MEMORY_LIMIT:-1g}"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 4s
-      retries: 20
-      start_period: 5s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   data-api:
     build:
@@ -24,7 +35,7 @@ services:
     restart: unless-stopped
     command: ["node", "data-service/server.js"]
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
+      NODE_ENV: production
       DATA_API_PORT: 4001
       DATA_API_TOKEN: ${DATA_API_TOKEN:?Set DATA_API_TOKEN in .env}
       DATA_API_POOL_MAX: ${DATA_API_POOL_MAX:-15}
@@ -38,12 +49,23 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: non-blocking
+    deploy:
+      resources:
+        limits:
+          cpus: "${DATA_API_CPU_LIMIT:-0.75}"
+          memory: "${DATA_API_MEMORY_LIMIT:-512m}"
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
-      interval: 5s
-      timeout: 4s
-      retries: 20
-      start_period: 10s
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=4", "-O", "/dev/null", "http://127.0.0.1:4001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     expose:
       - "4001"
 
@@ -54,7 +76,7 @@ services:
     container_name: super-cube-game-runtime
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: production
       SERVER_GAME_RUNTIME_PORT: 4100
       SERVER_GAME_RUNTIME_TOKEN: ${SERVER_GAME_RUNTIME_TOKEN:?Set SERVER_GAME_RUNTIME_TOKEN in .env}
       SERVER_GAME_DOCKER_IMAGE: ${SERVER_GAME_DOCKER_IMAGE:-node:22-alpine}
@@ -65,14 +87,28 @@ services:
       - platform-storage:/app/storage:ro
       # Required by the dedicated runtime manager only. Do not mount into Platform API.
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "4178:4178/udp"
+      - "4178:4178/tcp"
     expose:
       - "4100"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: non-blocking
+    deploy:
+      resources:
+        limits:
+          cpus: "${GAME_RUNTIME_CPU_LIMIT:-1.00}"
+          memory: "${GAME_RUNTIME_MEMORY_LIMIT:-512m}"
     healthcheck:
       test: ["CMD-SHELL", "docker info >/dev/null 2>&1"]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 6
-      start_period: 10s
+      retries: 3
+      start_period: 20s
 
   platform:
     build:
@@ -81,7 +117,7 @@ services:
     restart: unless-stopped
     command: ["node", "server.js"]
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: production
       PORT: 3000
       BASE_URL: ${BASE_URL:-http://localhost:3000}
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
@@ -112,6 +148,17 @@ services:
       - "${PORT:-3000}:3000"
     volumes:
       - platform-storage:/app/storage
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: non-blocking
+    deploy:
+      resources:
+        limits:
+          cpus: "${PLATFORM_CPU_LIMIT:-1.50}"
+          memory: "${PLATFORM_MEMORY_LIMIT:-1g}"
 
 volumes:
   postgres-data:

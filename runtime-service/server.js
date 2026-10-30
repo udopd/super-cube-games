@@ -222,6 +222,7 @@ async function startOne(slug) {
     '--entrypoint', 'sh', image, '-c', `set -eu; test -f /src/games/${slug}/server/index.js; cp -a /src/games/${slug}/. /dst/; chmod -R a+rX /dst`], 60000);
   await ensureNetwork(slug);
   const id = await execDocker(['run', '-d', '--name', container,
+    '--log-driver=json-file', '--log-opt', 'max-size=10m', '--log-opt', 'max-file=3', '--log-opt', 'mode=non-blocking',
     '--network', network, '--cpus=0.50', '--memory=256m', '--memory-swap=256m', '--pids-limit=128',
     '--read-only', '--tmpfs', '/tmp:rw,noexec,nosuid,size=32m', '--cap-drop=ALL', '--security-opt=no-new-privileges:true',
     '--user=10001:10001', '-e', `PORT=${gamePort}`, `--expose=${gamePort}`, '--label', `com.supercube.game-port=${gamePort}`, '--mount', `type=volume,source=${volume},target=/app,readonly`,
