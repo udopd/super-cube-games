@@ -121,12 +121,30 @@ async function getContainerIp(container) {
   if (!net.isIP(ip)) throw new Error('Could not resolve the isolated game container IP.');
   return ip;
 }
+async function getContainerPort(container) {
+  const output = await execDocker(['inspect', '--format', '{{index .Config.Labels "com.supercube.game-port"}}', container]).catch(() => '');
+  const value = Number(output.trim());
+  return Number.isInteger(value) && value >= 1024 && value <= 65535 ? value : 3000;
+}
+async function readGamePort(slug) {
+  const file = `/app/storage/games/${safeSlug(slug)}/server/port.txt`;
+  let value;
+  try { value = (await fs.readFile(file, 'utf8')).trim(); }
+  catch (error) {
+    if (error.code === 'ENOENT') return 3000;
+    throw error;
+  }
+  if (!/^\d{1,5}$/.test(value)) throw new Error('server/port.txt must contain a port number from 1024 to 65535.');
+  const gamePort = Number(value);
+  if (!Number.isInteger(gamePort) || gamePort < 1024 || gamePort > 65535) throw new Error('server/port.txt must contain a port number from 1024 to 65535.');
+  return gamePort;
+}
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-async function readyPing(ip) {
+async function readyPing(ip, gamePort) {
   for (let i = 0; i < 30; i += 1) {
     const started = performance.now();
     const ready = await new Promise(resolve => {
-      const request = http.get({ host: ip, port: 3000, path: '/', timeout: 500 }, response => {
+      const request = http.get({ host: ip, port: gamePort, path: '/', timeout: 500 }, response => {
         response.resume(); resolve(response.statusCode < 500 ? Math.round(performance.now() - started) : null);
       });
       request.on('timeout', () => { request.destroy(); resolve(null); });
@@ -166,15 +184,17 @@ async function stopOne(slug) {
 }
 async function startOne(slug) {
   slug = safeSlug(slug);
+  const gamePort = await readGamePort(slug);
   const prior = instances.get(slug);
   if (await containerIsRunning(names(slug).container)) {
     const { container, network, volume } = names(slug);
+    const runningPort = await getContainerPort(container);
     await execDocker(['network', 'connect', network, runtimeContainerName]).catch(err => { if (!/already exists|already connected/i.test(err.message)) throw err; });
     const ip = await getContainerIp(container);
-    const pingMs = await readyPing(ip);
-    if (pingMs !== null) {
+    const pingMs = await readyPing(ip, runningPort);
+    if (pingMs !== null && runningPort === gamePort) {
       const id = (await execDocker(['inspect', '--format', '{{.Id}}', container])).slice(0, 64);
-      const existing = { slug, id, container, network, volume, ip, startedAt: prior?.startedAt || Date.now(), state: 'running', pingMs };
+      const existing = { slug, id, container, network, volume, ip, port: runningPort, startedAt: prior?.startedAt || Date.now(), state: 'running', pingMs };
       instances.set(slug, existing);
       return existing;
     }
@@ -204,17 +224,17 @@ async function startOne(slug) {
   const id = await execDocker(['run', '-d', '--name', container,
     '--network', network, '--cpus=0.50', '--memory=256m', '--memory-swap=256m', '--pids-limit=128',
     '--read-only', '--tmpfs', '/tmp:rw,noexec,nosuid,size=32m', '--cap-drop=ALL', '--security-opt=no-new-privileges:true',
-    '--user=10001:10001', '-e', 'PORT=3000', '--mount', `type=volume,source=${volume},target=/app,readonly`,
+    '--user=10001:10001', '-e', `PORT=${gamePort}`, `--expose=${gamePort}`, '--label', `com.supercube.game-port=${gamePort}`, '--mount', `type=volume,source=${volume},target=/app,readonly`,
     '-w', '/app', image, 'node', '/app/server/index.js'], 30000);
   let ip = '';
   try { ip = await getContainerIp(container); } catch { /* exited containers are retained for logs below */ }
-  const pingMs = ip ? await readyPing(ip) : null;
+  const pingMs = ip ? await readyPing(ip, gamePort) : null;
   if (pingMs === null) {
     const logs = await gameContainerLogs(container);
     await stopOne(slug);
-    throw new Error(`Server game did not become ready on 0.0.0.0:3000. Startup logs: ${logs}`);
+    throw new Error(`Server game did not become ready on 0.0.0.0:${gamePort}. Startup logs: ${logs}`);
   }
-  const instance = { slug, id: id.slice(0, 64), container, network, volume, ip, startedAt: Date.now(), state: 'running', pingMs };
+  const instance = { slug, id: id.slice(0, 64), container, network, volume, ip, port: gamePort, startedAt: Date.now(), state: 'running', pingMs };
   instances.set(slug, instance);
   return instance;
 }
@@ -231,9 +251,10 @@ async function statusOne(slug) {
   const network = names(slug).network;
   await execDocker(['network', 'connect', network, runtimeContainerName]).catch(err => { if (!/already exists|already connected/i.test(err.message)) throw err; });
   const ip = await getContainerIp(container);
-  const pingMs = await readyPing(ip);
+  const gamePort = await getContainerPort(container);
+  const pingMs = await readyPing(ip, gamePort);
   if (pingMs === null) return { slug, state: 'unhealthy', pingMs: null };
-  const instance = { slug, id: (await execDocker(['inspect', '--format', '{{.Id}}', container])).slice(0, 64), container, network, volume: names(slug).volume, ip, state: 'running', pingMs, startedAt: Date.now() };
+  const instance = { slug, id: (await execDocker(['inspect', '--format', '{{.Id}}', container])).slice(0, 64), container, network, volume: names(slug).volume, ip, port: gamePort, state: 'running', pingMs, startedAt: Date.now() };
   instances.set(slug, instance);
   return instance;
 }
@@ -246,10 +267,11 @@ async function proxyHttp(req, res, slug, url) {
   let upstreamPath = url.pathname.slice(marker.length) || '/';
   if (!upstreamPath.startsWith('/')) upstreamPath = `/${upstreamPath}`;
   upstreamPath += url.search;
-  const headers = { ...req.headers, host: `${instance.ip}:3000`, 'x-forwarded-host': req.headers['x-forwarded-host'] || req.headers.host || '', 'x-forwarded-proto': req.headers['x-forwarded-proto'] || 'http' };
+  const gamePort = Number(instance.port) || 3000;
+  const headers = { ...req.headers, host: `${instance.ip}:${gamePort}`, 'x-forwarded-host': req.headers['x-forwarded-host'] || req.headers.host || '', 'x-forwarded-proto': req.headers['x-forwarded-proto'] || 'http' };
   for (const key of ['content-length', 'cookie', 'authorization', 'proxy-authorization', 'x-csrf-token', 'x-runtime-token', 'origin', 'referer', 'host']) delete headers[key];
-  headers.host = `${instance.ip}:3000`;
-  const upstream = http.request({ hostname: instance.ip, port: 3000, method: req.method, path: upstreamPath, headers, timeout: 15000 }, response => {
+  headers.host = `${instance.ip}:${gamePort}`;
+  const upstream = http.request({ hostname: instance.ip, port: gamePort, method: req.method, path: upstreamPath, headers, timeout: 15000 }, response => {
     res.writeHead(response.statusCode || 502, response.headers);
     response.pipe(res);
   });
@@ -264,16 +286,17 @@ async function proxyUpgrade(req, socket, head, slug, url) {
   let upstreamPath = url.pathname.slice(marker.length) || '/';
   if (!upstreamPath.startsWith('/')) upstreamPath = `/${upstreamPath}`;
   upstreamPath += url.search;
-  const upstream = net.connect(3000, instance.ip);
+  const gamePort = Number(instance.port) || 3000;
+  const upstream = net.connect(gamePort, instance.ip);
   upstream.on('connect', () => {
     const lines = [`${req.method} ${upstreamPath} HTTP/${req.httpVersion}`];
     const raw = req.rawHeaders || [];
     for (let i = 0; i < raw.length; i += 2) {
       const name = raw[i]; const key = name.toLowerCase();
-      if (key === 'host') lines.push(`Host: ${instance.ip}:3000`);
+      if (key === 'host') lines.push(`Host: ${instance.ip}:${gamePort}`);
       else if (!['cookie', 'authorization', 'proxy-authorization', 'x-csrf-token', 'x-runtime-token', 'origin', 'referer'].includes(key)) lines.push(`${name}: ${raw[i + 1]}`);
     }
-    if (!raw.some((v, i) => i % 2 === 0 && v.toLowerCase() === 'host')) lines.push(`Host: ${instance.ip}:3000`);
+    if (!raw.some((v, i) => i % 2 === 0 && v.toLowerCase() === 'host')) lines.push(`Host: ${instance.ip}:${gamePort}`);
     upstream.write(`${lines.join('\r\n')}\r\n\r\n`);
     if (head?.length) upstream.write(head);
     socket.pipe(upstream).pipe(socket);

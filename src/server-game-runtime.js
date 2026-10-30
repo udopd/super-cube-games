@@ -43,7 +43,7 @@ export async function ensureServerGame(game) {
   if (pendingStarts.has(slug)) return pendingStarts.get(slug);
   const promise = requestRuntime(`/v1/games/${encodeURIComponent(slug)}/start`, { method: 'POST', timeout: 90000 })
     .then(result => {
-      const instance = { slug, id: result.id || null, state: result.state || 'running', startedAt: result.startedAt || Date.now(), pingMs: result.pingMs ?? null };
+      const instance = { slug, id: result.id || null, state: result.state || 'running', startedAt: result.startedAt || Date.now(), pingMs: result.pingMs ?? null, port: result.port || 3000 };
       instances.set(slug, instance);
       return instance;
     })
@@ -54,7 +54,7 @@ export async function ensureServerGame(game) {
 export async function serverGameStatus(slug) {
   const safe = safeSlug(slug);
   const result = await requestRuntime(`/v1/games/${encodeURIComponent(safe)}/status`, { timeout: 8000 });
-  if (result.state === 'running') instances.set(safe, { slug: safe, id: result.id || null, state: 'running', startedAt: result.startedAt || Date.now(), pingMs: result.pingMs ?? null });
+  if (result.state === 'running') instances.set(safe, { slug: safe, id: result.id || null, state: 'running', startedAt: result.startedAt || Date.now(), pingMs: result.pingMs ?? null, port: result.port || 3000 });
   else instances.delete(safe);
   return result;
 }

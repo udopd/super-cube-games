@@ -283,6 +283,16 @@ export async function createDraftFromZip({ db, zipBuffer, storageDir }) {
       const serverEntry = path.join(root, 'server', 'index.js');
       const serverStat = await fsp.stat(serverEntry).catch(() => null);
       if (!serverStat?.isFile() || serverStat.size > 2 * 1024 * 1024) throw new GameArchiveError('Server games must include server/index.js (up to 2 MB).');
+      const portFile = path.join(root, 'server', 'port.txt');
+      const portStat = await fsp.stat(portFile).catch(() => null);
+      if (portStat) {
+        if (!portStat.isFile() || portStat.size > 16) throw new GameArchiveError('server/port.txt must be a text file containing one port number.');
+        const portText = (await fsp.readFile(portFile, 'utf8')).trim();
+        const serverPort = Number(portText);
+        if (!/^\d{1,5}$/.test(portText) || !Number.isInteger(serverPort) || serverPort < 1024 || serverPort > 65535) {
+          throw new GameArchiveError('server/port.txt must contain a port number from 1024 to 65535.');
+        }
+      }
     }
     const capsule = await findValidCapsule(root);
     const faviconPath = await findValidFavicon(root);
