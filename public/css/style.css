@@ -4664,3 +4664,49 @@ button.dashboard-widget-drag-handle {
   .dashboard-widget #globalStatsSecondary .stat { padding: 10px 7px; }
   .dashboard-widget #globalStatsSecondary .stat-value { font-size: clamp(16px, 4vw, 22px); }
 }
+
+/* Game pages keep essential header actions visible on mobile. */
+@media(max-width:760px) {
+  .game-page .topbar-inner {
+    flex-wrap: nowrap;
+    gap: 8px;
+    min-height: 62px
+  }
+
+  .game-page .topbar-inner>.brand {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: clamp(10px, 3.2vw, 14px)
+  }
+
+  .game-page .topbar-inner>.game-top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    flex: 0 1 auto;
+    flex-wrap: nowrap
+  }
+
+  .game-page .back-game {
+    padding: 8px 7px;
+    font-size: 11px;
+    white-space: nowrap
+  }
+
+  .game-page .game-top-actions>.control {
+    flex: 0 0 auto;
+    padding: 6px 4px;
+    white-space: nowrap
+  }
+
+  .game-page .header-menu-toggle {
+    display: none !important
+  }
+}

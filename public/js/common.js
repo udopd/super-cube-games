@@ -166,6 +166,9 @@
     return `<span class="rating-stars" aria-label="${rating.toFixed(1)} out of 5">${stars}</span>${showNumber ? `<span class="rating-number">${rating > 0 ? rating.toFixed(1) : '—'}</span>` : ''}`;
   }
   function installResponsiveHeaderMenus() {
+    // Keep the compact game-player actions visible on narrow screens instead
+    // of moving them into the site's responsive dropdown.
+    if (document.body.classList.contains('game-page')) return;
     document.querySelectorAll('.topbar-inner').forEach((inner) => {
       const brand = inner.querySelector(':scope > .brand');
       if (!brand) return;

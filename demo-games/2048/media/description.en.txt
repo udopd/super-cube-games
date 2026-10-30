@@ -1,1 +1,0 @@
-Merge number tiles, plan each move, and reach 2048. Includes move undo, a saved best score, and touch controls for mobile play.
